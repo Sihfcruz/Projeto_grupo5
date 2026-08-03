@@ -1,0 +1,376 @@
+main{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    min-height:100vh;
+}
+
+/* ===========================
+   CARD PRINCIPAL
+=========================== */
+
+#caixa-login {
+  width: 1180px;
+  height: 700px;
+
+  display: flex;
+
+  background: var(--cor-branco);    
+
+  border-radius: var(--radius-grande);
+
+  overflow: hidden;
+
+  box-shadow: var(--sombra-card);
+
+  position: relative;
+}
+
+/* ===========================
+   LADO ESQUERDO
+=========================== */
+
+#lateral-esquerda {
+  width: 45%;
+  position: relative;
+
+  padding: 55px;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+
+  color: white;
+
+  background:
+    linear-gradient(rgba(8, 20, 37, 0.82), rgba(8, 20, 37, 0.88)),
+    url("../images/industria.jpg");
+
+  background-size: cover;
+  background-position: center;
+}
+
+#titulo-empresa {
+  font-size: 3.4rem;
+  font-weight: 700;
+  margin-bottom: 18px;
+}
+
+#lateral-esquerda p {
+  width: 75%;
+
+  line-height: 1.9;
+
+  font-size: 1.18rem;
+
+    color: rgba(255, 255, 255, 0.75);
+}
+
+/* ===========================
+   CAIXA DE SEGURANÇA
+=========================== */
+
+#caixa-criptografia {
+  width: 320px;
+  height: 82px;
+
+  background: rgba(255, 255, 255, 0.08);
+
+  backdrop-filter: blur(15px);
+
+  border: 1px solid rgba(255, 255, 255, 0.08);
+
+  border-radius: var(--radius-medio);
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
+  padding-left: 70px;
+
+  position: relative;
+}
+
+#caixa-criptografia svg {
+  position: absolute;
+  left: 20px;
+  top: 22px;
+
+  width: 28px;
+  height: 28px;
+
+  color: white;
+}
+
+#caixa-criptografia h1 {
+  font-size: 0.9rem;
+  letter-spacing: 0.08rem;
+}
+
+#caixa-criptografia p {
+  margin-top: 3px;
+  font-size: 0.92rem;
+  color: rgba(255, 255, 255, 0.75);
+}
+
+/* ===========================
+   LADO DIREITO
+=========================== */
+
+#lateral-direita {
+  flex: 1;
+
+  padding: 70px 80px;
+
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-conteudo h1 {
+  font-size: 2.7rem;
+  font-weight: 700;
+}
+
+.modal-conteudo p {
+  margin-top: 14px;
+
+  color: var(--cor-texto-secundario);
+
+  width: 470px;
+
+  line-height: 1.8;
+}
+
+#linha-separadora {
+    margin-top: 30px;
+    color: var(--cor-texto-secundario);
+    width: 10px;
+    height: 0;
+}
+
+/* ===========================
+   FORM
+=========================== */
+
+#secao-login {
+  margin-top: 65px;
+}
+
+#form-login {
+  display: grid;
+  row-gap: 18px;
+
+  position: relative;
+}
+
+#form-login label {
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+#form-login input {
+  width: 100%;
+  height: 56px;
+
+  border-radius: var(--radius-pequeno);
+
+  border: 1px solid var(--cor-borda);
+
+  background: white;
+
+  padding-left: 48px;
+
+  font-size: 1rem;
+
+  transition: var(--transicao);
+}
+
+#form-login input:focus {
+  outline: none;
+  border-color: #0f376d;
+
+  box-shadow: 0 0 0 3px rgba(15, 55, 109, 0.15);
+}
+
+/* ===========================
+   ÍCONES
+=========================== */
+
+#form-login svg {
+  position: absolute;
+}
+
+.email-icon {
+  left: 15px;
+  top: 56px;
+  width: 20px;
+}
+
+#form-login svg:nth-of-type(2) {
+  left: 12px;
+  top: 166px;
+  width: 26px;
+}
+
+#form-login svg:nth-of-type(3) {
+  right: 16px;
+  top: 168px;
+  width: 20px;
+  cursor: pointer;
+}
+
+/* ===========================
+   ESQUECEU SENHA
+=========================== */
+
+#form-login a {
+  position: absolute;
+
+  right: 0;
+  top: 130px;
+
+  font-size: 0.85rem;
+
+  text-decoration: none;
+
+  color: #173d6b;
+
+  font-weight: 600;
+}
+
+#form-login a:hover {
+  text-decoration: underline;
+}
+
+/* ===========================
+   BOTÃO
+=========================== */
+
+#botao-login {
+  margin-top: 10px;
+
+  position: relative;
+}
+
+#botao-login button {
+  width: 100%;
+  height: 58px;
+
+  border: none;
+
+  border-radius: var(--radius-pequeno);
+
+  cursor: pointer;
+
+  background: var(--cor-primaria);
+
+  color: white;
+
+  font-size: 1rem;
+
+  font-weight: 700;
+
+  transition: var(--transicao);
+}
+
+#botao-login button:hover {
+  background: var(--cor-secundaria);
+}
+
+#botao-login svg {
+  position: absolute;
+
+  right: 22px;
+  top: 17px;
+
+  stroke: white;
+  width: 22px;
+}
+
+/* ===========================
+   TEXTO FINAL
+=========================== */
+
+#lateral-direita > p {
+  margin-top: auto;
+
+  padding-top: 30px;
+
+  border-top: 1px solid #e5e7eb;
+
+  width: 100%;
+
+  color: #7a7d82;
+
+  line-height: 1.8;
+
+  font-size: 0.95rem;
+}
+
+#lateral-direita > p a {
+  color: #002046;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+#lateral-direita > p a:hover {
+    text-decoration: underline;
+}
+
+/* ===========================
+   BOTÃO TEMA
+=========================== */
+
+#modo-escuro {
+  position: absolute;
+
+  top: 22px;
+  right: 22px;
+}
+
+#theme-toggle {
+  background: none; /* Remove a cor de fundo cinza */
+  border: none; /* Remove a borda padrão */
+  padding: 0; /* Remove o espaçamento interno */
+  margin: 0; /* Remove margens externas */
+  cursor: pointer; /* Mantém a mãozinha ao passar o mouse */
+  outline: none; /* Remove a linha de foco padrão */
+  display: inline-flex; /* Alinha o SVG perfeitamente no centro */
+  align-items: center;
+  justify-content: center;
+}
+
+#theme-toggle:hover .icon-moon {
+  opacity: 50%;
+  transition: all 0.3s ease;
+}
+
+.icon-moon {
+  width: 22px;
+  height: 22px;
+}
+
+/* ===========================
+   RESPONSIVO
+=========================== */
+
+@media (max-width: 980px) {
+  #caixa-login {
+    width: 95%;
+    height: auto;
+    flex-direction: column;
+  }
+
+  #lateral-esquerda {
+    width: 100%;
+    min-height: 320px;
+  }
+
+  #lateral-direita {
+    padding: 50px;
+  }
+
+  .modal-conteudo p {
+    width: 100%;
+  }
+}
