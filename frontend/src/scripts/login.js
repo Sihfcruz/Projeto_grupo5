@@ -17,3 +17,9 @@ function mostrarSenha() {
     senha.type = "password";
   }
 }
+
+formLogin.addEventListener("submit", (event) => {
+  event.preventDefault();
+
+  window.location.href = "dashboard.html";
+});
