@@ -2,9 +2,9 @@ const FuncionarioService = require("../services/FuncionarioService");
 
 class FuncionarioController {
 
-    async listar(req, res) {
+    async listarFuncionarios(req, res) {
         try {
-            const funcionarios = await FuncionarioService.listar();
+            const funcionarios = await FuncionarioService.listarFuncionarios();
 
             return res.status(200).json(funcionarios);
         } catch (error) {
@@ -17,8 +17,7 @@ class FuncionarioController {
     async buscarPorId(req, res) {
         try {
             const { id } = req.params;
-
-            const funcionario = await FuncionarioService.buscarPorId(id);
+            const funcionario = await FuncionarioService.buscarFuncionarioPorId(id);
 
             return res.status(200).json(funcionario);
         } catch (error) {
@@ -30,7 +29,7 @@ class FuncionarioController {
 
     async cadastrar(req, res) {
         try {
-            const funcionario = await FuncionarioService.cadastrar(req.body);
+            const funcionario = await FuncionarioService.cadastrarFuncionario(req.body);
 
             return res.status(201).json(funcionario);
         } catch (error) {
@@ -43,8 +42,7 @@ class FuncionarioController {
     async atualizar(req, res) {
         try {
             const { id } = req.params;
-
-            const funcionario = await FuncionarioService.atualizar(id, req.body);
+            const funcionario = await FuncionarioService.atualizarFuncionario(id, req.body);
 
             return res.status(200).json(funcionario);
         } catch (error) {
@@ -57,12 +55,9 @@ class FuncionarioController {
     async excluir(req, res) {
         try {
             const { id } = req.params;
+            const resposta = await FuncionarioService.deletarFuncionario(id);
 
-            await FuncionarioService.excluir(id);
-
-            return res.status(200).json({
-                mensagem: "Funcionário desativado."
-            });
+            return res.status(200).json(resposta);
         } catch (error) {
             return res.status(500).json({
                 erro: error.message
