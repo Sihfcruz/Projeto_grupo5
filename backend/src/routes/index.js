@@ -29,14 +29,6 @@ router.get('/', (req, res) => {
 })
 
 
-const ProdutoRoutes = require('./ProdutoRoutes');
-const CargoRoutes = require('./CargoRoutes');
-const FuncionarioRoutes = require('./FuncionarioRoutes');
-const EstoqueRoutes = require('./EstoqueRoutes');
-const EntradaRoutes = require('./EntradaRoutes');
-const SaidaRoutes = require('./SaidaRoutes');
-const DevolucaoRoutes = require('./DevolucaoRoutes')
-
 router.use('/produto', ProdutoRoutes);
 router.use('/cargo', CargoRoutes);
 router.use('/funcionarios', FuncionarioRoutes);

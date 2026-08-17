@@ -65,16 +65,17 @@ class FuncionarioService {
         throw new AppError('Data de nascimento inválida', 400)
        }
 
-       const idadeDiff = new Date(Date.now() - dataNascimento.getTime())
+       const idadeDiff = new Date(Date.now() - dataNasc.getTime())
        const idade = Math.abs(idadeDiff.getUTCFullYear() - 1970)
        if(idade < 14) {
         throw new AppError('O funcionario deve ter no mínimo 14 anos de idade', 422)
        }
 
+       /*
        const cargoExistente = await FuncionarioRepository.buscarFuncionarioUnico(idCargo)
        if(!cargoExistente) {
         throw new AppError('Cargo informado não existe no sistema', 404)
-       }
+       }*/
 
        const senhaHash = await bcrypt.hash(senha.trim(), this.#SALT_ROUNDS)
 
@@ -87,7 +88,6 @@ class FuncionarioService {
         ativo: true
        }
 
-       const idCriado = await FuncionarioRepository.cadastrarFuncionario(novoFuncionario)
 
        const resultado = await FuncionarioRepository.cadastrarFuncionario(novoFuncionario)
 
@@ -106,7 +106,7 @@ class FuncionarioService {
 
         const funcionarioExistente = await FuncionarioRepository.buscarFuncionarioUnico(idNumerico)
 
-        if(!funcionarioExistente || funcionarioExistente.ativo) {
+        if(!funcionarioExistente || !funcionarioExistente.ativo) {
             throw new AppError('Funcionario não encontrado ou inativo', 404)
         }
 
@@ -151,7 +151,7 @@ class FuncionarioService {
         await FuncionarioRepository.atualizarFuncionario(idNumerico, payloadAtualizacao)
 
         return {
-            suesso: true,
+            sucesso: true,
             mensagem: 'Funcionario atualizado com sucesso'
         }
     }

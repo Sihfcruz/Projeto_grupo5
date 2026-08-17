@@ -3,17 +3,17 @@ const pool = require('../config/database')
 class FuncionarioRepository {
 
     async buscarTodosFuncionarios(){
-        const [rows] = await pool.query('SELECT * FROM funcionarios ORDER BY id DESC')
+        const [rows] = await pool.query('SELECT * FROM funcionario')
         return rows
     }
 
     async buscarFuncionarioUnico(id){
-        const [funcionarioRows] = await SecurityPolicyViolationEvent.query('SELECT * FROM funcionarios WHERE id = ?', [id])
+        const [funcionarioRows] = await pool.query('SELECT * FROM funcionario WHERE id_funcionario = ?', [id])
         
         if(funcionarioRows.length === 0) return null
         
         const funcionario = funcionarioRows[0]
-
+        return funcionario
     }
 
     async cadastrarFuncionario(funcionarioData) {
@@ -24,7 +24,7 @@ class FuncionarioRepository {
         try {
             await connection.beginTransaction()
 
-            const [result] = await connection.query('INSERT INTO funcionarios (nome_completo, data_nascimento, senha, email, id_cargo) VALUES (?, ?, ?, ?, ?)', [nome, dataNascimento, senha, email, idCargo])
+            const [result] = await connection.query('INSERT INTO funcionario (nome_completo, data_nascimento, senha, email, id_cargo) VALUES (?, ?, ?, ?, ?)', [nome, dataNascimento, senha, email, idCargo])
 
             const funcionarioId = result.insertId
 
@@ -52,13 +52,13 @@ class FuncionarioRepository {
         if(fields.length === 0) return null
 
         values.push(id)
-        const query = `UPDATE funcionarios SET ${fields.join(', ')} WHERE id = ?`
+        const query = `UPDATE funcionario SET ${fields.join(', ')} WHERE id = ?`
         const [result] = await pool.query(query, values)
         return result.affectedRows
     }
 
     async apagarFuncionario(id) {
-        const [result] = await pool.query('DELETE FROM funcionarios WHERE id = ?', [id])
+        const [result] = await pool.query('DELETE FROM funcionario WHERE id = ?', [id])
         return result.affectedRows
     }
 
