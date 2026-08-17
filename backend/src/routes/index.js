@@ -1,5 +1,9 @@
 const express = require('express')
 const router = express.Router()
+const DevolucaoRoutes = require('./DevolucaoRoutes')
+const EntradaRoutes = require('./EntradaRoutes')
+const SaidaRoutes = require('./SaidaRoutes')
+
 
 
 router.get('/', (req, res) => {
@@ -14,5 +18,9 @@ router.get('/', (req, res) => {
         ]
     })
 })
+
+router.use('/entradas', EntradaRoutes)
+router.use('/devolucao', DevolucaoRoutes)
+router.use('/saidas', SaidaRoutes)
 
 module.exports = router
