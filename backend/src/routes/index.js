@@ -28,6 +28,7 @@ router.get('/', (req, res) => {
     })
 })
 
+<<<<<<< HEAD
 const ProdutoRoutes = require('./ProdutoRoutes');
 const CargoRoutes = require('./CargoRoutes');
 const FuncionarioRoutes = require('./FuncionarioRoutes');
@@ -37,6 +38,11 @@ const SaidaRoutes = require('./SaidaRoutes');
 const DevolucaoRoutes = require('./DevolucaoRoutes')
 
 
+=======
+
+
+
+>>>>>>> ab8520b2b3d35622a92cc9969db9ed2a73ee5f8a
 router.use('/produto', ProdutoRoutes);
 // router.use('/cargo', CargoRoutes);
 router.use('/funcionarios', FuncionarioRoutes);
