@@ -1,5 +1,14 @@
 const express = require('express')
 const router = express.Router()
+const DevolucaoRoutes = require('./DevolucaoRoutes')
+const EntradaRoutes = require('./EntradaRoutes')
+const SaidaRoutes = require('./SaidaRoutes')
+const ProdutoRoutes = require('./ProdutoRoutes');
+// const CargoRoutes = require('./CargoRoutes');
+const FuncionarioRoutes = require('./FuncionarioRoutes');
+// const EstoqueRoutes = require('./EstoqueRoutes');
+
+
 
 
 router.get('/', (req, res) => {
@@ -19,13 +28,18 @@ router.get('/', (req, res) => {
     })
 })
 
+<<<<<<< HEAD
 const ProdutoRoutes = require('./ProdutoRoutes');
 const CargoRoutes = require('./CargoRoutes');
 const FuncionarioRoutes = require('./FuncionarioRoutes');
 const EstoqueRoutes = require('./EstoqueRoutes');
 const EntradaRoutes = require('./EntradaRoutes');
 const SaidaRoutes = require('./SaidaRoutes');
-const DevolucaoRoutes = require('./DevolucaoRoutes');
+const DevolucaoRoutes = require('./DevolucaoRoutes')
+
+
+
+>>>>>>> 9e5c4d1398ec5538464871c3c2330e2b14220df3
 
 router.use('/produto', ProdutoRoutes);
 router.use('/cargo', CargoRoutes);
