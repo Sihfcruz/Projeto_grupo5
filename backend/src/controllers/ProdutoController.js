@@ -1,72 +1,80 @@
-const ProdutoService = require("../services/ProdutoService");
+const ProdutoService = require('../services/ProdutoService');
 
 class ProdutoController {
 
-    async listar(req, res) {
-        try {
-            const produtos = await ProdutoService.listar(req.query);
+        async listarAtivos(req, res) {
+    try {
+        const produtos = await ProdutoService.listarAtivos();
+        return res.status(200).json({ sucesso: true, dados: produtos });
+    } catch (erro) {
+        return res.status(500).json({ sucesso: false, mensagem: erro.message });
+    }
+    }
 
-            return res.status(200).json(produtos);
-        } catch (error) {
-            return res.status(500).json({
-                erro: error.message
-            });
-        }
+    async listarDesativados(req, res) {
+    try {
+        const produtos = await ProdutoService.listarDesativados();
+        return res.status(200).json({ sucesso: true, dados: produtos });
+    } catch (erro) {
+        return res.status(500).json({ sucesso: false, mensagem: erro.message });
+    }
     }
 
     async buscarPorId(req, res) {
         try {
-            const { id } = req.params;
 
-            const produto = await ProdutoService.buscarPorId(id);
+            const resultado = await ProdutoService.buscarProdutoPorId(req.params.id);
 
-            return res.status(200).json(produto);
-        } catch (error) {
-            return res.status(500).json({
-                erro: error.message
+            res.json(resultado);
+
+        } catch (erro) {
+
+            res.status(erro.status || 500).json({
+                sucesso: false,
+                mensagem: erro.mensagem || "Erro interno do servidor",
+                erro: erro.stack || erro
             });
+
         }
     }
 
-    async cadastrar(req, res) {
-        try {
-            const produto = await ProdutoService.cadastrar(req.body);
+    
 
-            return res.status(201).json(produto);
-        } catch (error) {
-            return res.status(500).json({
-                erro: error.message
-            });
-        }
+async cadastrar(req, res) {
+    try {
+        console.log("REQ.BODY:", req.body);
+
+        const resultado = await ProdutoService.cadastrarProduto(req.body);
+
+        res.status(201).json(resultado);
+
+    } catch (erro) {
+        res.status(erro.status || 500).json({
+            sucesso: false,
+            mensagem: erro.mensagem || 'Erro interno do servidor',
+            erro: erro.toString()
+        });
     }
+}
 
     async atualizar(req, res) {
         try {
-            const { id } = req.params;
 
-            const produto = await ProdutoService.atualizar(id, req.body);
+            const resultado = await ProdutoService.atualizarProduto(
+                req.params.id,
+                req.body
+            );
 
-            return res.status(200).json(produto);
-        } catch (error) {
-            return res.status(500).json({
-                erro: error.message
+            res.json(resultado);
+
+        } catch (erro) {
+
+            res.status(erro.status || 500).json({
+                sucesso: false,
+                mensagem: erro.mensagem || "Erro interno do servidor",
+                erro: erro.stack || erro
             });
-        }
-    }
 
-    async excluir(req, res) {
-        try {
-            const { id } = req.params;
-
-            await ProdutoService.excluir(id);
-
-            return res.status(200).json({
-                mensagem: "Produto removido com sucesso."
-            });
-        } catch (error) {
-            return res.status(500).json({
-                erro: error.message
-            });
         }
     }
 
