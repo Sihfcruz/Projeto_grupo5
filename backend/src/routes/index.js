@@ -4,7 +4,7 @@ const DevolucaoRoutes = require('./DevolucaoRoutes')
 const EntradaRoutes = require('./EntradaRoutes')
 const SaidaRoutes = require('./SaidaRoutes')
 const ProdutoRoutes = require('./ProdutoRoutes');
-// const CargoRoutes = require('./CargoRoutes');
+const CargoRoutes = require('./CargoRoutes');
 const FuncionarioRoutes = require('./FuncionarioRoutes');
 // const EstoqueRoutes = require('./EstoqueRoutes');
 
@@ -34,7 +34,7 @@ router.get('/', (req, res) => {
 router.use('/produto', ProdutoRoutes);
 router.use('/cargo', CargoRoutes);
 router.use('/funcionarios', FuncionarioRoutes);
-router.use('/estoque', EstoqueRoutes);
+//router.use('/estoque', EstoqueRoutes);
 router.use('/entrada', EntradaRoutes);
 router.use('/saida', SaidaRoutes);
 router.use('/devolucao', DevolucaoRoutes);

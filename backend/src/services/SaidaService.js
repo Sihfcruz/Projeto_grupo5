@@ -101,6 +101,7 @@ class SaidaService {
       }
     }
 
+    /*
     // 3. Validação da Data de Saída (compara com a data atual do sistema)
     const dataAtual = new Date();
     const dataInformada = new Date(dataSaida);
@@ -113,7 +114,7 @@ class SaidaService {
 
     if (!dataInformadaFormatada) {
       throw new Error("A data de saída deve ser informada");
-    }
+    }*/
 
     // 4. Validação de existência no Banco de Dados
     const produtoExiste = await ProdutoRepository.findById(codigoProduto);

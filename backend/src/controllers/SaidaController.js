@@ -4,7 +4,7 @@ class SaidaController {
 
     async listar(req, res) {
         try {
-            const saidas = await SaidaService.listar();
+            const saidas = await SaidaService.listarSaidas();
 
             return res.status(200).json(saidas);
         } catch (error) {
@@ -18,7 +18,7 @@ class SaidaController {
     
                 const saidas = await SaidaService.listarSaidasPorId(id)
     
-                return res.status(200).json(entradas);
+                return res.status(200).json(saidas);
             } catch (error) {
                 return res.status(500).json({
                     erro: error.message
@@ -29,7 +29,7 @@ class SaidaController {
 
     async cadastrar(req, res) {
         try {
-            const saida = await SaidaService.cadastrar(req.body);
+            const saida = await SaidaService.criarSaida(req.body);
 
             return res.status(201).json(saida);
         } catch (error) {

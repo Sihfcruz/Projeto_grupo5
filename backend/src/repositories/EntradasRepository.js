@@ -3,12 +3,12 @@ const pool = require('../config/database')
 class EntradasRepository {
 
     async buscarTodasEntradas(){
-        const [rows] = await pool.query('SELECT * FROM entradas ORDER BY id DESC')
+        const [rows] = await pool.query('SELECT * FROM entrada')
         return rows
     }
 
     async buscarEntradaPorId(id) {
-        const [entradaRows] = await pool.query('SELECT * FROM entradas WHERE id = ?', [id])
+        const [entradaRows] = await pool.query('SELECT * FROM entrada WHERE id_entrada = ?', [id])
 
         if(entradaRows.length === 0) return null
 
@@ -23,7 +23,7 @@ class EntradasRepository {
         try {
             await connection.beginTransaction()
 
-            const [result] = await connection.query('INSERT INTO entradas (id_cadastro, quantidade, peso_total, data_entrada, data_validade, lote, etiqueta, valor) VALUES (?, ?, ?, ?, ?, ?, ?, ?)', [idCadastro, quantidade, pesoTotal, dataEntrada, dataValidade, lote, etiqueta, valor])
+            const [result] = await connection.query('INSERT INTO entrada (id_cadastro, quantidade, peso_total, data_entrada, data_validade, lote, etiqueta, valor) VALUES (?, ?, ?, ?, ?, ?, ?, ?)', [idCadastro, quantidade, pesoTotal, dataEntrada, dataValidade, lote, etiqueta, valor])
 
             const entradaId = result.insertId
 
@@ -34,7 +34,7 @@ class EntradasRepository {
             await connection.rollback()
             throw error
         } finally {
-            connection.release
+            connection.release()
         }
         
     }

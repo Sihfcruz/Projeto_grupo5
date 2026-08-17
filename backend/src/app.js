@@ -6,7 +6,7 @@ const rateLimit = require('express-rate-limit')
 const compression = require('compression')
 
 const app = express()
-routes = require('./routes')
+const routes = require('./routes')
 const errorHandler = require('./middlewares/errorHandler')
 const requestIdMiddleware = require('./middlewares/requestId')
 const requestLogger = require('./middlewares/requestLogger')

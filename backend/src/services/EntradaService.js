@@ -22,7 +22,7 @@ class EntradaService {
         return {
             sucesso: true,
             dados: entradas,
-            total: dados.length
+            total: entradas.length
         }
     }
 

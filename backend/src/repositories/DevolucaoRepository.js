@@ -4,13 +4,13 @@ class DevolucaoRepository {
 
     async buscarTodasDevolucoes() {
 
-        const [rows] = await pool.query('SELECT * FROM devolucoes ORDER BY DESC')
+        const [rows] = await pool.query('SELECT * FROM devolucao')
         return rows
     }
 
     async buscarDevolucoesPorId(id) {
 
-        const [devolucaoRows] = await pool.query('SELECT * FROM devoilucoes WHERE id = ?', [id])
+        const [devolucaoRows] = await pool.query('SELECT * FROM devolucao WHERE id_devolucao = ?', [id])
 
         if(devolucaoRows.length === 0) return null
 
@@ -25,9 +25,9 @@ class DevolucaoRepository {
         try {
             await connection.beginTransaction()
 
-            const [result] = await pool.query('INSERT INTO saidas SET ?', [devolucaoData])
+            const [result] = await connection.query('INSERT INTO devolucao SET ?', [devolucaoData])
         } catch (error) {
-            await connection.commit()
+            await connection.rollback()
             throw error
         } finally {
             connection.release()

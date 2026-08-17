@@ -13,7 +13,7 @@ class DevolucaoService {
     const devolucoes = await DevolucaoRepository.buscarTodasDevolucoes();
 
     if (!devolucoes) {
-      throw AppError("Nenhuma devolução encontrada", 404);
+      throw new AppError("Nenhuma devolução encontrada", 404);
     }
 
     return {
@@ -109,6 +109,7 @@ class DevolucaoService {
       }
     }
 
+    /*
     // 5. Validação da Data (se informada, deve ser igual à data atual)
     if (dataEntrada) {
       const dataAtualFormatada = new Date().toISOString().split("T")[0];
@@ -128,7 +129,7 @@ class DevolucaoService {
       throw new Error(
         `Produto com o código ${codigoProduto} não foi encontrado.`,
       );
-    }
+    }*/
 
     /*
     if (idCadastro) {

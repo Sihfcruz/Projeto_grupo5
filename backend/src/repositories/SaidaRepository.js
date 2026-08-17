@@ -3,12 +3,12 @@ const pool = require('../config/database')
 class SaidaRepository {
 
     async buscarTodasSaidas(){
-        const [rows] = await pool.query('SELECT * FROM saidas ORDER BY DESC')
+        const [rows] = await pool.query('SELECT * FROM saida')
         return rows
     }
 
     async buscarSaidaPorId(id) {
-        const [saidaRows] = await pool.query('SELECT * FROM saidas WHERE id = ?', [id])
+        const [saidaRows] = await pool.query('SELECT * FROM saida WHERE id_saida = ?', [id])
 
         if (saidaRows.length === 0) return null
 

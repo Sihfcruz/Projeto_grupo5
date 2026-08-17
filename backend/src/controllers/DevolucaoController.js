@@ -18,7 +18,7 @@ class DevolucaoController {
             try {
                 const { id } = req.params;
     
-                const entradas = await DevolucaoService.listarDevolucaoPorId
+                const entradas = await DevolucaoService.listarDevolucaoPorId(id)
     
                 return res.status(200).json(entradas);
             } catch (error) {
