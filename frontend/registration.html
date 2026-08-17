@@ -1,0 +1,286 @@
+<!doctype html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Nômade - Cadastro de Itens</title>
+    <link rel="stylesheet" href="src/styles/global.css" />
+    <link rel="stylesheet" href="src/styles/dashboard.css" />
+    <link rel="stylesheet" href="src/styles/registration.css" />
+    <script src="src/scripts/registration.js" defer></script>
+  </head>
+
+  <body class="dashboard-page registration-page">
+    <aside id="sidebar">
+      <div class="brand">
+        <h1>Nômade</h1>
+        <p>Stock Management</p>
+      </div>
+
+      <nav class="sidebar-nav" aria-label="Navegação principal">
+        <a href="dashboard.html" class="nav-item">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <rect x="3" y="3" width="7" height="7" rx="1" />
+            <rect x="14" y="3" width="7" height="7" rx="1" />
+            <rect x="3" y="14" width="7" height="7" rx="1" />
+            <rect x="14" y="14" width="7" height="7" rx="1" />
+          </svg>
+          <span>Dashboard</span>
+        </a>
+
+        <a href="inventory.html" class="nav-item">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M4 7h16v14H4z" />
+            <path d="M7 3h10l2 4H5l2-4Z" />
+            <path d="M9 12h6" />
+          </svg>
+          <span>Inventory</span>
+        </a>
+
+        <a href="registration.html" class="nav-item active">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="6" cy="6" r="1.5" />
+            <circle cx="12" cy="6" r="1.5" />
+            <circle cx="18" cy="6" r="1.5" />
+            <circle cx="6" cy="12" r="1.5" />
+            <circle cx="12" cy="12" r="1.5" />
+            <circle cx="18" cy="12" r="1.5" />
+            <circle cx="6" cy="18" r="1.5" />
+            <path d="m13 17 2 2 5-5" />
+          </svg>
+          <span>Registration</span>
+        </a>
+
+        <a href="reports.html" class="nav-item">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M4 19V5" />
+            <path d="M4 19h16" />
+            <rect x="7" y="12" width="2.5" height="4" />
+            <rect x="11" y="9" width="2.5" height="7" />
+            <rect x="15" y="6" width="2.5" height="10" />
+          </svg>
+          <span>Reports</span>
+        </a>
+
+        <a href="#" class="nav-item">
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <path
+              d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.38a2 2 0 0 0-.73-2.73l-.15-.09a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"
+            />
+            <circle cx="12" cy="12" r="3" />
+          </svg>
+          <span>Settings</span>
+        </a>
+      </nav>
+
+      <button
+        id="theme-toggle"
+        class="theme-toggle"
+        type="button"
+        aria-label="Alternar tema"
+      >
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path
+            d="M12 3c.132 0 .263 0 .393.007a7.5 7.5 0 0 0 7.92 12.446A9 9 0 1 1 12 3z"
+          />
+        </svg>
+        <span>Tema</span>
+      </button>
+    </aside>
+
+    <main id="registration-main">
+      <section class="registration-content">
+        <header class="registration-heading">
+          <div>
+            <h2>Cadastro de Itens</h2>
+            <p>
+              Insira as especificações para matérias-primas ou produtos
+              acabados.
+            </p>
+          </div>
+
+          <div class="registration-actions">
+            <button id="cancel-button" class="cancel-button" type="button">
+              Cancelar
+            </button>
+            <button class="save-button" type="submit" form="item-form">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M5 3h12l3 3v15H5z" />
+                <path d="M8 3v6h8V3" />
+                <path d="M8 17h8" />
+              </svg>
+              Salvar Item
+            </button>
+          </div>
+        </header>
+
+        <form id="item-form">
+          <div class="registration-grid">
+            <div class="registration-left">
+              <section class="form-card classification-card">
+                <h3>Classificação do Item</h3>
+                <div class="card-divider"></div>
+
+                <div class="classification-options">
+                  <label class="classification-option selected">
+                    <input
+                      type="radio"
+                      name="tipo-item"
+                      value="materia-prima"
+                      checked
+                    />
+                    <span class="radio-mark"></span>
+                    <span class="option-content">
+                      <strong>Matéria-Prima</strong>
+                      <span
+                        >Insumos para produção (ex:<br />couro, borracha,
+                        cola).</span
+                      >
+                    </span>
+                  </label>
+
+                  <label class="classification-option">
+                    <input
+                      type="radio"
+                      name="tipo-item"
+                      value="produto-acabado"
+                    />
+                    <span class="radio-mark"></span>
+                    <span class="option-content">
+                      <strong>Produto Acabado</strong>
+                      <span
+                        >Calçados finalizados prontos<br />para expedição.</span
+                      >
+                    </span>
+                  </label>
+                </div>
+              </section>
+
+              <section class="form-card general-card">
+                <h3>Informações Gerais</h3>
+                <div class="card-divider"></div>
+
+                <div class="form-grid">
+                  <label class="field field-name">
+                    <span>Nome do Item <b>*</b></span>
+                    <input type="text" placeholder="Ex: Couro Napa Preto" />
+                  </label>
+
+                  <label class="field field-code">
+                    <span>Código Interno (SKU) <b>*</b></span>
+                    <div class="input-with-icon">
+                      <input type="text" placeholder="Ex: MAT-001" />
+                      <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M4 5v14M8 5v14M12 5v14M16 5v14M20 5v14" />
+                      </svg>
+                    </div>
+                  </label>
+
+                  <label class="field field-description">
+                    <span>Descrição Detalhada</span>
+                    <textarea
+                      placeholder="Especificações técnicas, dimensões, etc..."
+                    ></textarea>
+                  </label>
+
+                  <label class="field field-category">
+                    <span>Categoria</span>
+                    <div class="select-wrap">
+                      <select>
+                        <option>Sintéticos</option>
+                      </select>
+                    </div>
+                  </label>
+
+                  <label class="field field-quantity">
+                    <span>Quantidade Inicial</span>
+                    <div class="quantity-wrap">
+                      <input type="text" placeholder="0.00" />
+                      <select aria-label="Unidade">
+                        <option>M²</option>
+                      </select>
+                    </div>
+                  </label>
+
+                  <label class="field field-lot">
+                    <span>Lote</span>
+                    <input type="text" placeholder="Ex: L-2401" />
+                  </label>
+                </div>
+              </section>
+            </div>
+
+            <aside class="registration-right">
+              <section class="form-card supply-card">
+                <h3>Fornecimento</h3>
+                <div class="card-divider"></div>
+
+                <label class="field">
+                  <span>Fornecedor Principal</span>
+                  <div class="select-wrap">
+                    <select>
+                      <option>Indústria Têxtil Silva</option>
+                    </select>
+                  </div>
+                </label>
+
+                <label class="field">
+                  <span>Rastreabilidade (NFE / Origem)</span>
+                  <input type="text" placeholder="Nº da Nota Fiscal" />
+                </label>
+
+                <div class="validation-row">
+                  <span>Possui Validade?</span>
+                  <label class="switch">
+                    <input id="validade-toggle" type="checkbox" checked />
+                    <span></span>
+                  </label>
+                </div>
+
+                <input
+                  id="validade-data"
+                  class="date-input"
+                  type="text"
+                  value="12/31/2025"
+                />
+              </section>
+
+              <section class="form-card labeling-card">
+                <h3>Etiquetagem</h3>
+                <div class="card-divider"></div>
+
+                <label class="field">
+                  <span>Modelo de Etiqueta</span>
+                  <div class="select-wrap">
+                    <select>
+                      <option>Padrão Almoxarifado (Código de Barras)</option>
+                    </select>
+                  </div>
+                </label>
+
+                <button class="print-button" type="button">
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M6 9V3h12v6" />
+                    <path
+                      d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"
+                    />
+                    <path d="M6 14h12v7H6z" />
+                  </svg>
+                  Imprimir Etiqueta Teste
+                </button>
+              </section>
+            </aside>
+          </div>
+        </form>
+      </section>
+    </main>
+  </body>
+</html>
