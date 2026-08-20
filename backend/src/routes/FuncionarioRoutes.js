@@ -12,4 +12,7 @@ router.put('/:id', FuncionarioController.atualizar);
 
 router.delete('/:id', FuncionarioController.excluir);
 
+
+
+
 module.exports = router;
