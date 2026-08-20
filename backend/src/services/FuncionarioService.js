@@ -13,6 +13,7 @@ class FuncionarioService {
     #EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; //regex de email simplificado
     #SALT_ROUNDS = 10 //custo de processamento bcrypts
 
+
     async listarFuncionarios() {
         const funcionarios = await FuncionarioRepository.buscarTodosFuncionarios()
 

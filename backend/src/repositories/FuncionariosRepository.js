@@ -2,6 +2,8 @@ const pool = require('../config/database')
 
 class FuncionarioRepository {
 
+    
+
     async buscarTodosFuncionarios(){
         const [rows] = await pool.query('SELECT * FROM funcionario')
         return rows
