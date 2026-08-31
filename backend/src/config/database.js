@@ -1,8 +1,7 @@
 const mysql = require('mysql2/promise')
 const config = require('./environment')
-const logger = require('../utils/logger')
-const { connect } = require('../app')
-const { Connection } = require('mysql2')
+const logger = require('../shared/lib/logger')
+
 
 const pool = mysql.createPool({
     host: config.database.host,
