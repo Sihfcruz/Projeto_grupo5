@@ -1,0 +1,524 @@
+.registration-page {
+  background: #f7f9fb;
+  color: #20262d;
+}
+
+#registration-main {
+  flex: 1;
+  min-width: 0;
+  background: #f7f9fb;
+}
+
+.registration-content {
+  padding: 36px 34px 50px 36px;
+}
+
+.registration-heading {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  margin-bottom: 28px;
+}
+
+.registration-heading h2 {
+  font-size: 24px;
+  line-height: 1.1;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+}
+
+.registration-heading p {
+  margin-top: 7px;
+  color: #68717c;
+  font-size: 11px;
+}
+
+.registration-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.cancel-button,
+.save-button {
+  height: 30px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.cancel-button {
+  width: 86px;
+  color: #16385e;
+  background: #fff;
+  border: 1px solid #ccd3db;
+}
+
+.save-button {
+  width: 116px;
+  color: #fff;
+  background: #082a59;
+  border: 1px solid #082a59;
+}
+
+.save-button svg,
+.print-button svg {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.cancel-button:hover {
+  background: #f5f7f9;
+}
+
+.save-button:hover {
+  background: #123d73;
+}
+
+.registration-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 216px;
+  gap: 18px;
+  align-items: start;
+}
+
+.registration-left {
+  min-width: 0;
+}
+
+.registration-right {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.form-card {
+  background: #fff;
+  border: 1px solid #d7dce2;
+  border-radius: 6px;
+  box-shadow: 0 2px 7px rgba(16, 38, 62, 0.05);
+  padding: 18px 18px 18px;
+}
+
+.form-card h3 {
+  font-size: 16px;
+  line-height: 1.2;
+  font-weight: 700;
+}
+
+.card-divider {
+  height: 1px;
+  background: #e6e9ec;
+  margin-top: 10px;
+}
+
+.classification-card {
+  height: 146px;
+}
+
+.classification-options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.classification-option {
+  height: 70px;
+  border: 1px solid #cfd5dc;
+  border-radius: 4px;
+  display: grid;
+  grid-template-columns: 16px 1fr;
+  align-items: start;
+  gap: 8px;
+  padding: 12px 12px;
+  cursor: pointer;
+}
+
+.classification-option.selected {
+  border: 2px solid #123d73;
+  padding: 12px 10px;
+  background: #f9fafc;
+}
+
+.classification-option input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.radio-mark {
+  width: 14px;
+  height: 14px;
+  margin-top: 1px;
+  border: 1px solid #8e98a3;
+  border-radius: 50%;
+  position: relative;
+}
+
+.classification-option.selected .radio-mark {
+  border: 4px solid #082a59;
+}
+
+.option-content {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.option-content strong {
+  color: #252b32;
+  font-size: 10px;
+  line-height: 1.1;
+}
+
+.option-content span {
+  margin-top: 4px;
+  color: #5d6670;
+  font-size: 10px;
+  line-height: 1.4;
+}
+
+.general-card {
+  height: 262px;
+  margin-top: 18px;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  column-gap: 12px;
+  row-gap: 10px;
+  margin-top: 10px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.field > span {
+  margin-bottom: 4px;
+  color: #343b43;
+  font-size: 8px;
+  line-height: 1.1;
+}
+
+.field > span b {
+  color: #3f4953;
+}
+
+.field input,
+.field textarea,
+.field select,
+.date-input {
+  width: 100%;
+  border: 1px solid #cfd5dc;
+  border-radius: 4px;
+  background: #fff;
+  color: #303840;
+  font-size: 10px;
+}
+
+.field input,
+.field select,
+.date-input {
+  height: 30px;
+  padding: 0 12px;
+}
+
+.field input::placeholder,
+.field textarea::placeholder {
+  color: #7a8490;
+}
+
+.field textarea {
+  height: 68px;
+  resize: none;
+  padding: 10px 12px;
+  line-height: 1.4;
+}
+
+.field input:focus,
+.field textarea:focus,
+.field select:focus,
+.date-input:focus {
+  border-color: #0f376d;
+  box-shadow: 0 0 0 2px rgba(15, 55, 109, 0.09);
+}
+
+.field-name {
+  grid-column: 1;
+}
+
+.field-code {
+  grid-column: 2 / 4;
+}
+
+.field-description {
+  grid-column: 1 / 4;
+}
+
+.field-category {
+  grid-column: 1;
+}
+
+.field-quantity {
+  grid-column: 2;
+}
+
+.field-lot {
+  grid-column: 3;
+}
+
+.input-with-icon,
+.quantity-wrap,
+.select-wrap {
+  position: relative;
+}
+
+.input-with-icon input {
+  padding-right: 28px;
+}
+
+.input-with-icon svg {
+  position: absolute;
+  right: 8px;
+  top: 8px;
+  width: 15px;
+  height: 15px;
+  fill: none;
+  stroke: #b4bbc3;
+  stroke-width: 1.4;
+}
+
+.select-wrap select {
+  appearance: none;
+  padding-right: 28px;
+  cursor: pointer;
+}
+
+.select-wrap::after {
+  content: "";
+  position: absolute;
+  right: 10px;
+  top: 10px;
+  width: 6px;
+  height: 6px;
+  border-right: 1px solid #6b7580;
+  border-bottom: 1px solid #6b7580;
+  transform: rotate(45deg);
+  pointer-events: none;
+}
+
+.quantity-wrap {
+  display: grid;
+  grid-template-columns: 1fr 54px;
+}
+
+.quantity-wrap input {
+  border-radius: 4px 0 0 4px;
+  min-width: 0;
+}
+
+.quantity-wrap select {
+  appearance: none;
+  border-left: 0;
+  border-radius: 0 4px 4px 0;
+  padding: 0 5px;
+  color: #4d5660;
+  font-size: 8px;
+  background: #eef1f4;
+}
+
+.supply-card {
+  height: 232px;
+}
+
+.supply-card .field {
+  margin-top: 10px;
+}
+
+.supply-card .field:first-of-type {
+  margin-top: 10px;
+}
+
+.validation-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 10px;
+  color: #343b43;
+  font-size: 8px;
+}
+
+.switch {
+  width: 26px;
+  height: 14px;
+  position: relative;
+  cursor: pointer;
+}
+
+.switch input {
+  position: absolute;
+  opacity: 0;
+}
+
+.switch span {
+  position: absolute;
+  inset: 0;
+  border-radius: 999px;
+  background: #aeb7c1;
+  transition: 0.2s ease;
+}
+
+.switch span::after {
+  content: "";
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  top: 2px;
+  left: 2px;
+  border-radius: 50%;
+  background: #fff;
+  transition: 0.2s ease;
+}
+
+.switch input:checked + span {
+  background: #082a59;
+}
+
+.switch input:checked + span::after {
+  transform: translateX(12px);
+}
+
+.date-input {
+  margin-top: 8px;
+}
+
+.labeling-card {
+  height: 186px;
+}
+
+.labeling-card .field {
+  margin-top: 10px;
+}
+
+.labeling-card .field select {
+  height: 48px;
+  white-space: normal;
+}
+
+.print-button {
+  width: 100%;
+  height: 40px;
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  color: #4c545d;
+  background: #f5f6f7;
+  border: 1px solid #dfe2e5;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.print-button:hover {
+  background: #eceff2;
+}
+
+.registration-page.dark-theme {
+  --dashboard-bg: #101923;
+  --sidebar-bg: #0c1725;
+  --border: #2a3745;
+  --nav-white: #edf3f8;
+}
+
+.registration-page.dark-theme #registration-main {
+  background: #101923;
+}
+
+.registration-page.dark-theme .form-card,
+.registration-page.dark-theme .cancel-button {
+  background: #162230;
+  border-color: #2a3745;
+  color: #e8edf2;
+}
+
+.registration-page.dark-theme .registration-heading p,
+.registration-page.dark-theme .field > span,
+.registration-page.dark-theme .option-content span,
+.registration-page.dark-theme .validation-row {
+  color: #aeb9c5;
+}
+
+.registration-page.dark-theme .card-divider,
+.registration-page.dark-theme .classification-option,
+.registration-page.dark-theme .field input,
+.registration-page.dark-theme .field textarea,
+.registration-page.dark-theme .field select,
+.registration-page.dark-theme .date-input {
+  border-color: #344252;
+  background: #121d29;
+  color: #e8edf2;
+}
+
+@media (max-width: 850px) {
+  .registration-content {
+    padding: 28px 24px 46px;
+  }
+
+  .registration-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .registration-right {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 650px) {
+  .registration-heading {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 18px;
+  }
+
+  .classification-options,
+  .registration-right {
+    grid-template-columns: 1fr;
+  }
+
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .field-name,
+  .field-code,
+  .field-description,
+  .field-category,
+  .field-quantity,
+  .field-lot {
+    grid-column: 1;
+  }
+
+  .classification-card,
+  .general-card,
+  .supply-card,
+  .labeling-card {
+    height: auto;
+  }
+}

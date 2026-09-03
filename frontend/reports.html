@@ -1,0 +1,306 @@
+<!doctype html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Nômade - Relatórios</title>
+    <link rel="stylesheet" href="src/styles/global.css" />
+    <link rel="stylesheet" href="src/styles/dashboard.css" />
+    <link rel="stylesheet" href="src/styles/reports.css" />
+    <script src="src/scripts/reports.js" defer></script>
+  </head>
+
+  <body class="dashboard-page reports-page">
+    <aside id="sidebar">
+      <div class="brand">
+        <h1>Nômade</h1>
+        <p>Stock Management</p>
+      </div>
+
+      <nav class="sidebar-nav" aria-label="Navegação principal">
+        <a href="dashboard.html" class="nav-item">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <rect x="3" y="3" width="7" height="7" rx="1" />
+            <rect x="14" y="3" width="7" height="7" rx="1" />
+            <rect x="3" y="14" width="7" height="7" rx="1" />
+            <rect x="14" y="14" width="7" height="7" rx="1" />
+          </svg>
+          <span>Dashboard</span>
+        </a>
+
+        <a href="inventory.html" class="nav-item">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M4 7h16v14H4z" />
+            <path d="M7 3h10l2 4H5l2-4Z" />
+            <path d="M9 12h6" />
+          </svg>
+          <span>Inventory</span>
+        </a>
+
+        <a href="registration.html" class="nav-item">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="6" cy="6" r="1.5" />
+            <circle cx="12" cy="6" r="1.5" />
+            <circle cx="18" cy="6" r="1.5" />
+            <circle cx="6" cy="12" r="1.5" />
+            <circle cx="12" cy="12" r="1.5" />
+            <circle cx="18" cy="12" r="1.5" />
+            <circle cx="6" cy="18" r="1.5" />
+            <path d="m13 17 2 2 5-5" />
+          </svg>
+          <span>Registration</span>
+        </a>
+
+        <a href="reports.html" class="nav-item active">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M4 19V5" />
+            <path d="M4 19h16" />
+            <rect x="7" y="12" width="2.5" height="4" />
+            <rect x="11" y="9" width="2.5" height="7" />
+            <rect x="15" y="6" width="2.5" height="10" />
+          </svg>
+          <span>Reports</span>
+        </a>
+
+        <a href="users.html" class="nav-item">
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <path
+              d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.38a2 2 0 0 0-.73-2.73l-.15-.09a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"
+            />
+            <circle cx="12" cy="12" r="3" />
+          </svg>
+          <span>Settings</span>
+        </a>
+      </nav>
+
+      <button
+        id="theme-toggle"
+        class="theme-toggle"
+        type="button"
+        aria-label="Alternar tema"
+      >
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path
+            d="M12 3c.132 0 .263 0 .393.007a7.5 7.5 0 0 0 7.92 12.446A9 9 0 1 1 12 3z"
+          />
+        </svg>
+        <span>Tema</span>
+      </button>
+    </aside>
+
+    <main id="reports-main">
+      <section class="reports-content">
+        <header class="reports-heading">
+          <div>
+            <h2>Relatórios e Indicadores</h2>
+            <p>
+              Análise detalhada de movimentação, desempenho e saúde do estoque.
+            </p>
+          </div>
+
+          <div class="report-actions">
+            <div class="filter-group">
+              <select id="period-filter" aria-label="Período">
+                <option>Últimos 30 dias</option>
+              </select>
+              <select id="category-filter" aria-label="Categoria">
+                <option>Todas Categorias</option>
+              </select>
+              <button id="export-button" type="button">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M12 3v11" />
+                  <path d="m8 10 4 4 4-4" />
+                  <path d="M5 19h14" />
+                </svg>
+                Exportar
+              </button>
+            </div>
+          </div>
+        </header>
+
+        <section class="indicator-grid">
+          <article class="indicator-card">
+            <div class="indicator-title">
+              <span>GIRO DE ESTOQUE</span>
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M20 11a8 8 0 0 0-14.7-4.2L4 9" />
+                <path d="M4 5v4h4" />
+                <path d="M4 13a8 8 0 0 0 14.7 4.2L20 15" />
+                <path d="M20 19v-4h-4" />
+              </svg>
+            </div>
+            <strong>4.2x <small>+0.5</small></strong>
+            <p>Média mensal</p>
+          </article>
+
+          <article class="indicator-card">
+            <div class="indicator-title">
+              <span>VALOR TOTAL EM<br />ESTOQUE</span>
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <rect x="3" y="5" width="18" height="14" rx="2" />
+                <path d="M7 9h10M7 13h6" />
+              </svg>
+            </div>
+            <strong>R$ 2.4M</strong>
+            <p>Atualizado hoje</p>
+          </article>
+
+          <article class="indicator-card">
+            <div class="indicator-title">
+              <span>ÍNDICE DE<br />DEVOLUÇÕES</span>
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M7 3h10v18H7z" />
+                <path d="M9 7h6M10 12h4M9 16h6" />
+              </svg>
+            </div>
+            <strong>1.8% <small class="negative">-0.2%</small></strong>
+            <p>Vs último período</p>
+          </article>
+
+          <article class="indicator-card">
+            <div class="indicator-title">
+              <span>PERDAS/AVARIAS</span>
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="m12 3 9 17H3L12 3Z" />
+                <path d="M12 9v5M12 17h.01" />
+              </svg>
+            </div>
+            <strong>0.5%</strong>
+            <p>Limite tolerável: 1%</p>
+          </article>
+        </section>
+
+        <section class="charts-grid">
+          <article class="report-panel movement-chart-panel">
+            <div class="report-panel-header">
+              <h3>Movimentação: Entrada vs Saída</h3>
+              <button
+                type="button"
+                class="more-button"
+                aria-label="Mais opções"
+              >
+                ⋮
+              </button>
+            </div>
+
+            <div class="movement-chart">
+              <div class="grid-line line-1"></div>
+              <div class="grid-line line-2"></div>
+              <div class="grid-line line-3"></div>
+              <div class="grid-line line-4"></div>
+              <div class="chart-bars">
+                <div class="bar-pair">
+                  <span class="entry-bar" style="height: 58px"></span
+                  ><span class="exit-bar" style="height: 44px"></span>
+                </div>
+                <div class="bar-pair">
+                  <span class="entry-bar" style="height: 0"></span
+                  ><span class="exit-bar" style="height: 44px"></span>
+                </div>
+                <div class="bar-pair">
+                  <span class="entry-bar" style="height: 88px"></span
+                  ><span class="exit-bar" style="height: 65px"></span>
+                </div>
+                <div class="bar-pair">
+                  <span class="entry-bar" style="height: 80px"></span
+                  ><span class="exit-bar" style="height: 60px"></span>
+                </div>
+                <div class="bar-pair">
+                  <span class="entry-bar" style="height: 80px"></span
+                  ><span class="exit-bar" style="height: 101px"></span>
+                </div>
+                <div class="bar-pair">
+                  <span class="entry-bar" style="height: 115px"></span
+                  ><span class="exit-bar" style="height: 89px"></span>
+                </div>
+                <div class="bar-pair">
+                  <span class="entry-bar" style="height: 129px"></span
+                  ><span class="exit-bar" style="height: 106px"></span>
+                </div>
+                <div class="bar-pair">
+                  <span class="entry-bar" style="height: 0"></span
+                  ><span class="exit-bar" style="height: 96px"></span>
+                </div>
+              </div>
+            </div>
+
+            <div class="chart-legend">
+              <span><i class="legend-entry"></i>Entradas</span>
+              <span><i class="legend-exit"></i>Saídas</span>
+            </div>
+          </article>
+
+          <article class="report-panel category-panel">
+            <div class="report-panel-header">
+              <h3>Distribuição por<br />Categoria</h3>
+            </div>
+
+            <div class="donut-area">
+              <div class="donut-chart">
+                <div class="donut-center">
+                  <strong>12k</strong><span>Itens</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="category-list">
+              <div>
+                <span><i class="dot tennis"></i>Tênis Casual</span><b>45%</b>
+              </div>
+              <div>
+                <span><i class="dot esportivo"></i>Esportivo</span><b>35%</b>
+              </div>
+              <div>
+                <span><i class="dot botas"></i>Botas</span><b>20%</b>
+              </div>
+            </div>
+          </article>
+        </section>
+
+        <section class="report-panel movement-table-panel">
+          <div class="report-panel-header">
+            <h3>Itens com Maior Movimentação</h3>
+            <a href="#">Ver todos</a>
+          </div>
+          <div class="report-table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>ITEM</th>
+                  <th>CATEGORIA</th>
+                  <th>TOTAL ENTRADA</th>
+                  <th>TOTAL SAÍDA</th>
+                  <th>SALDO LÍQUIDO</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>NMD Runner V2</td>
+                  <td><span class="category-tag">Esportivo</span></td>
+                  <td>1,250</td>
+                  <td>1,100</td>
+                  <td class="balance-positive">+150</td>
+                </tr>
+                <tr>
+                  <td>Urban Classic Low</td>
+                  <td><span class="category-tag">Tênis Casual</span></td>
+                  <td>800</td>
+                  <td>850</td>
+                  <td class="balance-negative">-50</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </section>
+    </main>
+  </body>
+</html>
