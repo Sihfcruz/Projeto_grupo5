@@ -37,3 +37,4 @@
 {"level":"info","message":{"duration":"2ms","ip":"::ffff:127.0.0.1","method":"GET","path":"/","requestId":"6d8f7716-be8b-4ff5-b256-cf7ce3487ceb","status":500,"userAgent":"Thunder Client (https://www.thunderclient.com)"},"service":"backend-ferraz","timestamp":"2026-08-31 09:06:48"}
 {"level":"info","message":"Conexão com o banco de dados estabelecida","service":"backend-ferraz","timestamp":"2026-08-31 09:08:29"}
 {"level":"info","message":{"duration":"109ms","ip":"::ffff:127.0.0.1","method":"GET","path":"/","requestId":"c1857cf8-633e-4e27-aeb0-33cb29855434","status":200,"userAgent":"Thunder Client (https://www.thunderclient.com)"},"service":"backend-ferraz","timestamp":"2026-08-31 09:08:41"}
+{"level":"error","message":"Erro ao conectar com o banco de dados:","service":"nomade","timestamp":"2026-09-14 08:47:31"}
