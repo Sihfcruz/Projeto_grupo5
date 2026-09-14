@@ -2,7 +2,7 @@ const pool = require('../../config/database')
 
 class EntradasRepository {
 
-    async buscarTodasEntradas(){
+    async buscarTodasEntradas() {
         const [rows] = await pool.query('SELECT * FROM entrada')
         return rows
     }
@@ -10,14 +10,14 @@ class EntradasRepository {
     async buscarEntradaPorId(id) {
         const [entradaRows] = await pool.query('SELECT * FROM entrada WHERE id_entrada = ?', [id])
 
-        if(entradaRows.length === 0) return null
+        if (entradaRows.length === 0) return null
 
-        const entradas = entradaRows
+        const entradas = entradaRows[0]
         return entradas
     }
 
     async create(EntradaData) {
-        const { idCadastro, quantidade, pesoTotal, dataEntrada, dataValidade, lote, etiqueta, valor} = EntradaData
+        const { idCadastro, quantidade, pesoTotal, dataEntrada, dataValidade, lote, etiqueta, valor } = EntradaData
         const connection = await pool.getConnection()
 
         try {
@@ -36,7 +36,7 @@ class EntradasRepository {
         } finally {
             connection.release()
         }
-        
+
     }
 }
 
