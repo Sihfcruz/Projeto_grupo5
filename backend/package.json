@@ -4,7 +4,10 @@
   "description": "API de Gestão de Estoque",
   "main": "src/server.js",
   "scripts": {
-    "start": "node src/server.js"
+    "start": "node src/server.js",
+    "test": "jest --runInBand",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage"
   },
   "dependencies": {
     "bcrypt": "^6.0.0",
@@ -18,5 +21,12 @@
     "mysql2": "^3.23.3",
     "uuid": "^14.0.1",
     "winston": "^3.19.0"
+  },
+  "devDependencies": {
+    "@types/jest": "^30.0.0",
+    "@types/node": "^26.5.1",
+    "jest": "^30.5.1",
+    "ts-jest": "^29.4.12",
+    "typescript": "^7.0.2"
   }
 }

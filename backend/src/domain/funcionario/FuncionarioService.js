@@ -9,11 +9,8 @@ class AppError extends Error {
 }
 
 class FuncionarioService {
-
-
-
-  #EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; //regex de email simplificado
-  #SALT_ROUNDS = 10; //custo de processamento bcrypts
+  #EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  #SALT_ROUNDS = 10;
 
   async listarFuncionarios() {
     const funcionarios = await FuncionarioRepository.buscarTodosFuncionarios();
@@ -60,7 +57,6 @@ class FuncionarioService {
       !email?.trim() ||
       !idCargo
     ) {
-      console.error("Validação falhous - campos obrigatórios");
       throw new AppError(
         "Nome, data de nascimento, senha, email, id do cargo são obrigatórios",
         400,
@@ -70,7 +66,7 @@ class FuncionarioService {
     const emailFormatado = email.trim().toLowerCase();
 
     if (!this.#EMAIL_REGEX.test(emailFormatado)) {
-      throw new AppError("Formato de e-mail inválido, 400");
+      throw new AppError("Formato de e-mail inválido", 400);
     }
 
     const dataNasc = new Date(dataNascimento);
@@ -86,12 +82,6 @@ class FuncionarioService {
         422,
       );
     }
-
-    /*
-       const cargoExistente = await FuncionarioRepository.buscarFuncionarioUnico(idCargo)
-       if(!cargoExistente) {
-        throw new AppError('Cargo informado não existe no sistema', 404)
-       }*/
 
     const senhaHash = await bcrypt.hash(senha.trim(), this.#SALT_ROUNDS);
 
@@ -110,7 +100,7 @@ class FuncionarioService {
     return {
       sucesso: true,
       mensagem: "Funcionário cadastrado com sucesso!",
-      id: idCriado,
+      id: resultado?.id || resultado?.insertId || resultado,
     };
   }
 
@@ -140,7 +130,7 @@ class FuncionarioService {
 
       if (emailFormatted !== funcionarioExistente.email) {
         const emailEmUso =
-          await FuncionarioRepository.buscarPorEmail(emailFormatted); //criar está função buscar por email
+          await FuncionarioRepository.buscarPorEmail(emailFormatted);
         if (emailEmUso) throw new AppError("Novo e-mail já está em uso", 409);
       }
       payloadAtualizacao.email = emailFormatted;
@@ -166,10 +156,7 @@ class FuncionarioService {
     }
 
     if (Object.keys(payloadAtualizacao).length === 0) {
-      throw {
-        status: 400,
-        mensagem: "Nenhum dado válido enviado para atualização",
-      };
+      throw new AppError("Nenhum dado válido enviado para atualização", 400);
     }
 
     await FuncionarioRepository.atualizarFuncionario(
