@@ -21,7 +21,7 @@ const config = {
     },
 
     jwt: {
-        secret: process.env.JWT_SECRET || 'seu_secret_muito_inseguro_em_producao',
+        secret: process.env.JWT_SECRET || process.env.JWT_SECRET_SECUNDARY,
         expiry: process.env.JWT_EXPIRY || '7d'
     },
 
