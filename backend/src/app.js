@@ -51,8 +51,8 @@ app.use(cors(corsOptions))
 
 
 // parsers
-app.use(express.json({ limit: '10mb'}))
-app.use(express.urlencoded({ limit: '10mb', extended: true}))
+app.use(express.json({ limit: '10mb' }))
+app.use(express.urlencoded({ limit: '10mb', extended: true }))
 
 //Rotas
 app.use('/auth', AuthRoutes);
@@ -87,7 +87,7 @@ app.use('/', router)
 
 
 //ERROR handling
-//middleware de rro por ultimo
+//middleware de erro por ultimo
 app.use(errorHandler)
 
 module.exports = app
