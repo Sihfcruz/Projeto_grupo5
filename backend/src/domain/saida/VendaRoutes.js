@@ -1,14 +1,14 @@
 const express = require('express');
 const router = express.Router();
-const SaidaController = require('./SaidaController');
+const VendaController = require('./VendaController');
 
 // Listar todas as saídas
-router.get('/', SaidaController.listar);
+router.get('/', VendaController.listar);
 
 // Buscar saída por ID
-router.get('/:id', SaidaController.buscarPorId);
+router.get('/:id', VendaController.buscarPorId);
 
 // Cadastrar nova saída
-router.post('/', SaidaController.cadastrar);
+router.post('/', VendaController.cadastrar);
 
 module.exports = router;
