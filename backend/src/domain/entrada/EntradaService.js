@@ -1,5 +1,5 @@
 const EntradasRepository = require('./EntradasRepository')
-const ProdutoRepository = require('../produto/ProdutoRepository')
+const SkuRepository = require('../sku/SkuRepository') // precisa expor findById(idSku)
 
 class AppError extends Error {
     constructor(message, statusCode = 400) {
@@ -8,14 +8,16 @@ class AppError extends Error {
     }
 }
 
+const ehInteiroPositivo = (valor) => Number.isInteger(valor) && valor > 0
+
 class EntradaService {
 
     async listarEntradas() {
-
         const entradas = await EntradasRepository.buscarTodasEntradas()
 
-        if (!entradas) {
-            throw new AppError('Nenhum produto encontrado', 404)
+        // buscarTodasEntradas retorna um array; array vazio também é "nenhum resultado"
+        if (!entradas || entradas.length === 0) {
+            throw new AppError('Nenhuma entrada encontrada', 404)
         }
 
         return {
@@ -26,14 +28,16 @@ class EntradaService {
     }
 
     async listarEntradaPorId(id) {
-        if (!id || isNaN(id)) {
-            throw new Error('Id inválido', 400)
+        const idNumerico = Number(id)
+
+        if (!ehInteiroPositivo(idNumerico)) {
+            throw new AppError('Id inválido', 400)
         }
 
-        const entrada = await EntradasRepository.buscarEntradaPorId(id)
+        const entrada = await EntradasRepository.buscarEntradaPorId(idNumerico)
 
         if (!entrada) {
-            throw new AppError('Nenhum produto encontrado', 404)
+            throw new AppError('Entrada não encontrada', 404)
         }
 
         return {
@@ -43,96 +47,97 @@ class EntradaService {
     }
 
     async criarEntrada(dados) {
-        // 1. Desestruturação dos campos de entrada
         const {
-            idCadastro,
-            codigoProduto,
+            idFuncionario,
+            idSku,
+            idFornecedor = null,
             quantidade,
-            pesoTotal,
-            dataEntrada,
-            dataValidade,
-            lote,
-            etiqueta,
-            valor
-        } = dados;
-
-        // 2. Validação de preenchimento (Campos obrigatórios de acordo com o NOT NULL da tabela)
-        // Observação: dataValidade é opcional (pode ser NULL no BD)
-        const camposObrigatorios = {
-            idCadastro,
-            codigoProduto,
-            quantidade,
-            pesoTotal,
+            valorTotal,
             dataEntrada,
             lote,
-            etiqueta,
-            valor
-        };
+            notaFiscal = null
+        } = dados || {}
 
-        for (const [campo, valorCampo] of Object.entries(camposObrigatorios)) {
+        // 1. Campos obrigatórios (idFornecedor e notaFiscal são opcionais)
+        const obrigatorios = { idFuncionario, idSku, quantidade, valorTotal, dataEntrada, lote }
+
+        for (const [campo, valorCampo] of Object.entries(obrigatorios)) {
             if (valorCampo === undefined || valorCampo === null || valorCampo === '') {
-                throw new Error(`O campo '${campo}' é obrigatório e deve ser preenchido.`);
+                throw new AppError(`O campo '${campo}' é obrigatório e deve ser preenchido.`)
             }
         }
 
-        // 3. Validação de strings
-        if (typeof lote !== 'string' || typeof etiqueta !== 'string') {
-            throw new Error("Os campos 'lote' e 'etiqueta' devem ser do tipo texto.");
-        }
-
-        // 4. Validação de números (devem ser do tipo number e maiores que zero)
-        const camposNumericos = {
-            idCadastro,
-            codigoProduto,
-            quantidade,
-            pesoTotal,
-            valor
-        };
-
-        for (const [campo, valorCampo] of Object.entries(camposNumericos)) {
-            if (typeof valorCampo !== 'number' || Number.isNaN(valorCampo) || valorCampo <= 0) {
-                throw new Error(`O campo '${campo}' deve ser um número válido e maior que zero.`);
+        // 2. Inteiros positivos (ids e quantidade)
+        for (const [campo, valorCampo] of Object.entries({ idFuncionario, idSku, quantidade })) {
+            if (!ehInteiroPositivo(valorCampo)) {
+                throw new AppError(`O campo '${campo}' deve ser um número inteiro maior que zero.`)
             }
         }
 
-        // 5. Validação da Data de Entrada (deve ser o momento atual do lançamento)
-        const dataInformada = new Date(dataEntrada);
-
-        const dataInformadaFormatada = !isNaN(dataInformada)
-            ? dataInformada.toISOString().split('T')[0]
-            : null;
-
-        if (!dataInformadaFormatada) {
-            throw new Error("A data de entrada deve ser preenchida");
+        if (idFornecedor !== null && !ehInteiroPositivo(idFornecedor)) {
+            throw new AppError("O campo 'idFornecedor' deve ser um número inteiro maior que zero.")
         }
 
-        // 6. Validação de existência no Banco de Dados
-        // Valida se o produto existe
-        const produtoExiste = await ProdutoRepository.findById(codigoProduto);
-        if (!produtoExiste) {
-            throw new Error(`Produto com o código ${codigoProduto} não foi encontrado.`);
+        // 3. Valor total (decimal positivo, máx. 2 casas)
+        if (typeof valorTotal !== 'number' || !Number.isFinite(valorTotal) || valorTotal <= 0) {
+            throw new AppError("O campo 'valorTotal' deve ser um número válido e maior que zero.")
         }
 
-        const novaEntrada = {
-            idCadastro: idCadastro,
-            codigoProduto: codigoProduto,
-            quantidade: quantidade,
-            pesoTotal: pesoTotal,
-            dataEntrada: dataInformadaFormatada,
-            lote: lote,
-            etiqueta: etiqueta,
-            valor: valor,
+        // 4. Textos e tamanhos máximos das colunas
+        if (typeof lote !== 'string' || lote.trim() === '' || lote.length > 20) {
+            throw new AppError("O campo 'lote' deve ser um texto de até 20 caracteres.")
         }
 
-        const resultado = await EntradasRepository.create(novaEntrada)
+        if (notaFiscal !== null && (typeof notaFiscal !== 'string' || notaFiscal.length > 44)) {
+            throw new AppError("O campo 'notaFiscal' deve ser um texto de até 44 caracteres.")
+        }
 
-        return {
-            sucesso: true,
-            mensagem: 'Entrada cadastrada com sucesso!',
-            dados: resultado
+        // 5. Data de entrada
+        const data = new Date(dataEntrada)
+
+        if (Number.isNaN(data.getTime())) {
+            throw new AppError('A data de entrada é inválida.')
+        }
+
+        const dataFormatada = data.toISOString().split('T')[0]
+
+        // 6. O SKU (tamanho + cor do tênis) precisa existir
+        const skuExiste = await SkuRepository.findById(idSku)
+
+        if (!skuExiste) {
+            throw new AppError(`SKU ${idSku} não foi encontrado.`, 404)
+        }
+
+        // 7. Grava e traduz erros do MySQL em mensagens amigáveis
+        try {
+            const idEntrada = await EntradasRepository.create({
+                idFuncionario,
+                idFornecedor,
+                idSku,
+                quantidade,
+                valorTotal,
+                dataEntrada: dataFormatada,
+                lote: lote.trim(),
+                notaFiscal
+            })
+
+            const entrada = await EntradasRepository.buscarEntradaPorId(idEntrada)
+
+            return {
+                sucesso: true,
+                mensagem: 'Entrada cadastrada com sucesso!',
+                dados: entrada
+            }
+        } catch (error) {
+            if (error.code === 'ER_DUP_ENTRY') {
+                throw new AppError('Já existe uma entrada com este lote para este SKU.', 409)
+            }
+            if (error.code === 'ER_NO_REFERENCED_ROW_2') {
+                throw new AppError('Funcionário, fornecedor ou SKU informado não existe.', 400)
+            }
+            throw error
         }
     }
-
 }
 
 module.exports = new EntradaService()
