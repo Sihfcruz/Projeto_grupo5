@@ -20,7 +20,7 @@ jest.mock('../produto/ProdutoRepository');
 
 const SaidaRepository = require('./SaidaRepository');
 const ProdutoRepository = require('../produto/ProdutoRepository');
-const SaidaService = require('./SaidaService');
+const SaidaService = require('./VendaService');
 
 const dadosValidos = () => ({
   idCadastro: 1,
