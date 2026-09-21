@@ -1,0 +1,290 @@
+<!doctype html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Nômade - Usuários e Permissões</title>
+    <link rel="stylesheet" href="src/styles/global.css" />
+    <link rel="stylesheet" href="src/styles/dashboard.css" />
+    <link rel="stylesheet" href="src/styles/users.css" />
+    <script src="src/scripts/users.js" defer></script>
+  </head>
+
+  <body class="dashboard-page users-page">
+    <aside id="sidebar">
+      <div class="brand">
+        <h1>Nômade</h1>
+        <p>Stock Management</p>
+      </div>
+
+      <nav class="sidebar-nav" aria-label="Navegação principal">
+        <a href="dashboard.html" class="nav-item">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <rect x="3" y="3" width="7" height="7" rx="1" />
+            <rect x="14" y="3" width="7" height="7" rx="1" />
+            <rect x="3" y="14" width="7" height="7" rx="1" />
+            <rect x="14" y="14" width="7" height="7" rx="1" />
+          </svg>
+          <span>Dashboard</span>
+        </a>
+
+        <a href="inventory.html" class="nav-item">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M4 7h16v14H4z" />
+            <path d="M7 3h10l2 4H5l2-4Z" />
+            <path d="M9 12h6" />
+          </svg>
+          <span>Inventory</span>
+        </a>
+
+        <a href="registration.html" class="nav-item">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="6" cy="6" r="1.5" />
+            <circle cx="12" cy="6" r="1.5" />
+            <circle cx="18" cy="6" r="1.5" />
+            <circle cx="6" cy="12" r="1.5" />
+            <circle cx="12" cy="12" r="1.5" />
+            <circle cx="18" cy="12" r="1.5" />
+            <circle cx="6" cy="18" r="1.5" />
+            <path d="m13 17 2 2 5-5" />
+          </svg>
+          <span>Registration</span>
+        </a>
+
+        <a href="reports.html" class="nav-item">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M4 19V5" />
+            <path d="M4 19h16" />
+            <rect x="7" y="12" width="2.5" height="4" />
+            <rect x="11" y="9" width="2.5" height="7" />
+            <rect x="15" y="6" width="2.5" height="10" />
+          </svg>
+          <span>Reports</span>
+        </a>
+
+        <a href="#" class="nav-item active">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path
+              d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.38a2 2 0 0 0-.73-2.73l-.15-.09a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2Z"
+            />
+            <circle cx="12" cy="12" r="3" />
+          </svg>
+          <span>Settings</span>
+        </a>
+      </nav>
+
+      <button class="theme-toggle" id="theme-toggle" type="button">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M21 12.8A8.5 8.5 0 0 1 11.2 3 8.5 8.5 0 1 0 21 12.8Z" />
+        </svg>
+        <span>Tema</span>
+      </button>
+    </aside>
+
+    <main id="users-main">
+      <header class="users-topbar">
+        <div class="users-search">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="11" cy="11" r="6.5" />
+            <path d="m16 16 4 4" />
+          </svg>
+          <input id="user-search" type="search" placeholder="Buscar..." />
+        </div>
+
+        <nav class="users-tabs" aria-label="Seções de administração">
+          <a class="active" href="users.html">Users</a>
+          <a href="#">Roles</a>
+          <a href="#">Permissions</a>
+        </nav>
+
+        <div class="users-actions">
+          <button type="button" aria-label="Tema">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M21 12.8A8.5 8.5 0 0 1 11.2 3 8.5 8.5 0 1 0 21 12.8Z" />
+            </svg>
+          </button>
+          <button type="button" aria-label="Notificações">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9" />
+              <path d="M10 21h4" />
+            </svg>
+          </button>
+          <button type="button" aria-label="Histórico">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M3 12a9 9 0 1 0 3-6.7" />
+              <path d="M3 4v5h5" />
+              <path d="M12 7v5l3 2" />
+            </svg>
+          </button>
+          <button class="new-user-button" type="button">
+            Adicione novo Usuário
+          </button>
+          <img class="users-avatar" src="src/images/avatar.png" alt="Perfil" />
+        </div>
+      </header>
+
+      <section class="users-content">
+        <div class="users-heading">
+          <div>
+            <h2>Usuários e Permissões</h2>
+            <p>Gerencie acessos e perfis da equipe industrial.</p>
+          </div>
+          <button class="invite-button" type="button">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <circle cx="9" cy="8" r="3" />
+              <path d="M3 19a6 6 0 0 1 12 0" />
+              <path d="M18 8v6M15 11h6" />
+            </svg>
+            Convidar Usuário
+          </button>
+        </div>
+
+        <div class="user-stats">
+          <article class="user-stat-card">
+            <div class="stat-icon blue">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <circle cx="9" cy="9" r="3" />
+                <circle cx="17" cy="10" r="2" />
+                <path d="M3 20a6 6 0 0 1 12 0" />
+                <path d="M15 17a4 4 0 0 1 6 3" />
+              </svg>
+            </div>
+            <div>
+              <span>Total de Usuários</span>
+              <strong>142</strong>
+            </div>
+          </article>
+
+          <article class="user-stat-card">
+            <div class="stat-icon light">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <circle cx="9" cy="8" r="3" />
+                <path d="M3 19a6 6 0 0 1 12 0" />
+                <path d="m16 13 2 2 4-4" />
+              </svg>
+            </div>
+            <div>
+              <span>Usuários Ativos</span>
+              <strong>128</strong>
+            </div>
+          </article>
+
+          <article class="user-stat-card pending-card">
+            <div class="stat-icon red">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M7 3h10v18H7z" />
+                <path d="M9 7h6M9 11h6" />
+                <path d="M12 15v3M12 20h.01" />
+              </svg>
+            </div>
+            <div>
+              <span>Solicitações Pendentes</span>
+              <strong>4</strong>
+            </div>
+          </article>
+        </div>
+
+        <section class="users-table-panel">
+          <div class="users-table-header">
+            <h3>Lista de Usuários</h3>
+            <button id="filter-button" type="button">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M4 6h16M7 12h10M10 18h4" />
+              </svg>
+              Filtros
+            </button>
+          </div>
+
+          <div class="table-wrap">
+            <table id="users-table">
+              <thead>
+                <tr>
+                  <th>Nome</th>
+                  <th>E-mail</th>
+                  <th>Departamento</th>
+                  <th>Perfil de Acesso</th>
+                  <th>Status</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><span class="initials">CS</span>Carlos Silva</td>
+                  <td>carlos.silva@stockpro.com</td>
+                  <td>Produção</td>
+                  <td>Gerente</td>
+                  <td><span class="status active-status">Ativo</span></td>
+                  <td class="actions-cell">
+                    <button type="button" aria-label="Editar">
+                      <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path
+                          d="m4 16-.7 4.7L8 20l11-11a2.1 2.1 0 0 0-3-3L5 17Z"
+                        />
+                        <path d="m14.5 7.5 2 2" />
+                      </svg>
+                    </button>
+                    <button type="button" aria-label="Excluir">
+                      <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path
+                          d="M5 7h14M10 11v6M14 11v6M9 7l1-2h4l1 2M7 7l1 14h8l1-14"
+                        />
+                      </svg>
+                    </button>
+                  </td>
+                </tr>
+                <tr>
+                  <td><span class="initials">AM</span>Ana Martins</td>
+                  <td>ana.martins@stockpro.com</td>
+                  <td>Logística</td>
+                  <td>Almoxarife</td>
+                  <td><span class="status active-status">Ativo</span></td>
+                  <td class="actions-cell">
+                    <button type="button" aria-label="Editar">
+                      <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path
+                          d="m4 16-.7 4.7L8 20l11-11a2.1 2.1 0 0 0-3-3L5 17Z"
+                        />
+                        <path d="m14.5 7.5 2 2" />
+                      </svg>
+                    </button>
+                    <button type="button" aria-label="Excluir">
+                      <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path
+                          d="M5 7h14M10 11v6M14 11v6M9 7l1-2h4l1 2M7 7l1 14h8l1-14"
+                        />
+                      </svg>
+                    </button>
+                  </td>
+                </tr>
+                <tr>
+                  <td><span class="initials">RO</span>Roberto Oliveira</td>
+                  <td>roberto.o@stockpro.com</td>
+                  <td>TI</td>
+                  <td>Administrador</td>
+                  <td><span class="status inactive-status">Inativo</span></td>
+                  <td class="actions-cell">
+                    <button type="button" aria-label="Editar">
+                      <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path
+                          d="m4 16-.7 4.7L8 20l11-11a2.1 2.1 0 0 0-3-3L5 17Z"
+                        />
+                        <path d="m14.5 7.5 2 2" />
+                      </svg>
+                    </button>
+                    <button type="button" aria-label="Excluir">
+                      <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path
+                          d="M5 7h14M10 11v6M14 11v6M9 7l1-2h4l1 2M7 7l1 14h8l1-14"
+                        />
+                      </svg>
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </section>
+    </main>
+  </body>
+</html>
