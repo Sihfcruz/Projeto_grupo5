@@ -1,5 +1,6 @@
 const SaidaRepository = require('./SaidaRepository');
 const ProdutoRepository = require('../produto/ProdutoRepository');
+const EstoqueRepository = require('../estoque/EstoqueRepository');
 
 class AppError extends Error {
   constructor(message, statusCode = 400) {
@@ -89,12 +90,76 @@ class SaidaService {
       codigoRastreamento,
     };
 
+<<<<<<< Updated upstream
     for (const [campo, valorCampo] of Object.entries(camposNumericos)) {
       if (
         typeof valorCampo !== "number" ||
         Number.isNaN(valorCampo) ||
         valorCampo <= 0
       ) {
+=======
+    // Se codigoRastreamento for enviado, valida também como número > 0
+    if (codigoRastreamento !== undefined && codigoRastreamento !== null && codigoRastreamento !== "") {
+      camposNumericos.codigoRastreamento = codigoRastreamento;
+    }
+
+    for (const [campo, val] of Object.entries(camposNumericos)) {
+      if (typeof val !== "number" || Number.isNaN(val) || val <= 0) {
+        throw new Error(`O campo '${campo}' deve ser um número válido e maior que zero.`);
+      }
+    }
+
+    // 5. Tratamento e formatação da Data
+    const dataParsed = new Date(dataSaida);
+    if (Number.isNaN(dataParsed.getTime())) {
+      throw new Error("A 'dataSaida' informada é inválida.");
+    }
+    // Formata para o padrão ISO de banco de dados (YYYY-MM-DD)
+    const dataSaidaFormatada = dataParsed.toISOString().split("T")[0];
+
+    // 6. Início da Transação no Banco de Dados
+    const connection = await pool.getConnection();
+
+    try {
+      await connection.beginTransaction();
+
+      // 6.1. Verificar se o produto existe
+      const produtoExiste = await ProdutoRepository.findById(codigoProduto, connection);
+      if (!produtoExiste) {
+        throw new Error(`Produto com o código ${codigoProduto} não foi encontrado.`);
+      }
+
+      /* 
+      // 6.2. Verificar se o cliente existe
+      const clienteExiste = await ClienteRepository.buscarPorCodigo(codigoCliente, connection);
+      if (!clienteExiste) {
+        throw new Error(`Cliente com o código ${codigoCliente} não foi encontrado.`);
+      }
+      */
+
+      /* 
+      // 6.3. Verificar se o lote existe
+      const loteExiste = await LoteRepository.buscarPorCodigo(lote, connection);
+      if (!loteExiste) {
+        throw new Error(`Lote '${lote}' não foi encontrado.`);
+      }
+      */
+
+      /* 
+      // 6.4. Verificar se a etiqueta existe
+      const etiquetaExiste = await EtiquetaRepository.buscarPorCodigo(etiqueta, connection);
+      if (!etiquetaExiste) {
+        throw new Error(`Etiqueta '${etiqueta}' não foi encontrada.`);
+      }
+      */
+
+      // 6.5. Verificar se a quantidade no estoque (VIEW) é suficiente
+      const estoque = await EstoqueRepository.listarCodigoProduto(codigoProduto)
+
+      const saldoAtual = estoque?.saldo_estoque || 0;
+
+      if (saldoAtual < unidades) {
+>>>>>>> Stashed changes
         throw new Error(
           `O campo ${campo} deve ser um número válido e maior que zero.`,
         );
