@@ -176,6 +176,28 @@ class FuncionarioService {
       throw new AppError("ID inválido", 400);
     }
 
+    const now = new Date()
+
+    const funcionarioExistente =
+      await FuncionarioRepository.buscarFuncionarioUnico(idNumerico);
+    if (!funcionarioExistente || !funcionarioExistente.ativo) {
+      throw new AppError("Funcionário não encontrado ou inativo", 404);
+    }
+
+    await FuncionarioRepository.softDeleteFuncionario(idNumerico, now);
+
+    return {
+      sucesso: true,
+      mensagem: "Funcionario desativado com sucesso",
+    };
+  }
+
+  async deletarFuncionarioPermanentemente(id) {
+    const idNumerico = Number(id);
+    if (!id || isNaN(idNumerico) || idNumerico <= 0) {
+      throw new AppError("ID inválido", 400);
+    }
+
     const funcionarioExistente =
       await FuncionarioRepository.buscarFuncionarioUnico(idNumerico);
     if (!funcionarioExistente || !funcionarioExistente.ativo) {
