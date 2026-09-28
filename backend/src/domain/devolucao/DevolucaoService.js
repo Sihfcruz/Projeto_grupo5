@@ -4,163 +4,142 @@ class AppError extends Error {
   constructor(message, statusCode = 400) {
     super(message);
     this.statusCode = statusCode;
+    this.name = 'AppError';
   }
 }
+
+const ehInteiroPositivo = (valor) => Number.isInteger(valor) && valor > 0;
+const REGEX_DATA_ISO = /^\d{4}-\d{2}-\d{2}$/;
 
 class DevolucaoService {
   async listarDevolucoes() {
     const devolucoes = await DevolucaoRepository.buscarTodasDevolucoes();
 
-    if (!devolucoes) {
-      throw new AppError("Nenhuma devolução encontrada", 404);
+    if (!devolucoes || devolucoes.length === 0) {
+      throw new AppError('Nenhuma devolução encontrada', 404);
     }
 
     return {
       sucesso: true,
       dados: devolucoes,
+      total: devolucoes.length
     };
   }
 
   async listarDevolucaoPorId(id) {
-    if (!id || isNaN(id)) {
-      throw new AppError("Id deve ser informado");
+    const idNumerico = Number(id);
+
+    if (!ehInteiroPositivo(idNumerico)) {
+      throw new AppError('Id inválido', 400);
     }
 
-    const devolucao = await DevolucaoRepository.buscarDevolucoesPorId(id);
+    const devolucao = await DevolucaoRepository.buscarDevolucoesPorId(idNumerico);
 
     if (!devolucao) {
-      throw new AppError("Nenhuma devolução encontrada", 404);
+      throw new AppError('Devolução não encontrada', 404);
     }
 
     return {
       sucesso: true,
-      dados: devolucao,
+      dados: devolucao
     };
   }
 
   async criarDevolucao(dados) {
-    // 1. Desestruturação dos campos com base na tabela devolucao
     const {
-      idCadastro,
-      codigoProduto,
-      unidades,
+      idFuncionario,
+      idItemVenda,
+      tipo,
+      quantidade,
       motivo,
-      reutilizacao,
-      valor,
-      dataEntrada,
-      etiqueta,
-    } = dados;
+      reutilizavel,
+      valorReembolso = 0,
+      idVendaTroca = null,
+      dataDevolucao
+    } = dados || {};
 
-    // 2. Validação de preenchimento (Campos NOT NULL no banco de dados)
-    const camposObrigatorios = {
-      codigoProduto,
-      unidades,
-      motivo,
-      reutilizacao,
-      valor,
-    };
+    // 1. Validação de Ids e Quantidade (Inteiros Positivos)
+    if (!ehInteiroPositivo(idFuncionario)) {
+      throw new AppError("O campo 'idFuncionario' deve ser um número inteiro positivo.");
+    }
+    if (!ehInteiroPositivo(idItemVenda)) {
+      throw new AppError("O campo 'idItemVenda' deve ser um número inteiro positivo.");
+    }
+    if (!ehInteiroPositivo(quantidade)) {
+      throw new AppError("O campo 'quantidade' deve ser um número inteiro positivo.");
+    }
 
-    for (const [campo, valorCampo] of Object.entries(camposObrigatorios)) {
-      if (
-        valorCampo === undefined ||
-        valorCampo === null ||
-        valorCampo === ""
-      ) {
-        throw new Error(
-          `O campo '${campo}' é obrigatório e deve ser preenchido.`,
-        );
+    // 2. Validação do Enum TIPO ('DEVOLUCAO' ou 'TROCA')
+    const tiposValidos = ['DEVOLUCAO', 'TROCA'];
+    if (!tipo || !tiposValidos.includes(tipo)) {
+      throw new AppError("O campo 'tipo' é obrigatório e deve ser 'DEVOLUCAO' ou 'TROCA'.");
+    }
+
+    // 3. Regra de Negócio: Tratamento do idVendaTroca baseado no tipo
+    let idVendaTrocaTratado = null;
+    if (tipo === 'TROCA') {
+      if (!ehInteiroPositivo(idVendaTroca)) {
+        throw new AppError("Para operações do tipo 'TROCA', o campo 'idVendaTroca' é obrigatório.");
       }
+      idVendaTrocaTratado = idVendaTroca;
+    } else if (idVendaTroca !== null && idVendaTroca !== undefined) {
+      throw new AppError("O campo 'idVendaTroca' não deve ser informado em devoluções simples.");
     }
 
-    // 3. Validação de tipos (Strings e Booleano)
-    if (
-      typeof motivo !== "string" ||
-      (etiqueta && typeof etiqueta !== "string")
-    ) {
-      throw new Error(
-        "Os campos 'motivo' e 'etiqueta' devem ser do tipo texto.",
-      );
+    // 4. Validação do Motivo (Até 500 caracteres)
+    if (typeof motivo !== 'string' || !motivo.trim() || motivo.trim().length > 500) {
+      throw new AppError("O campo 'motivo' é obrigatório e deve ter no máximo 500 caracteres.");
     }
 
-    if (typeof reutilizacao !== "boolean") {
-      throw new Error(
-        "O campo 'reutilizacao' deve ser um valor booleano (true ou false).",
-      );
+    // 5. Validação do Flag Reutilizável (Booleano)
+    if (typeof reutilizavel !== 'boolean') {
+      throw new AppError("O campo 'reutilizavel' deve ser do tipo booleano (true ou false).");
     }
 
-    // 4. Validação de números (devem ser do tipo number e maiores que zero)
-    const camposNumericos = {
-      codigoProduto,
-      unidades,
-      valor,
-      ...(idCadastro && { idCadastro }), // Valida idCadastro apenas se for fornecido
-    };
+    // 6. Validação do Valor de Reembolso
+    if (typeof valorReembolso !== 'number' || !Number.isFinite(valorReembolso) || valorReembolso < 0) {
+      throw new AppError("O campo 'valorReembolso' deve ser um número válido e maior ou igual a zero.");
+    }
 
-    for (const [campo, valorCampo] of Object.entries(camposNumericos)) {
-      if (
-        typeof valorCampo !== "number" ||
-        Number.isNaN(valorCampo) ||
-        valorCampo <= 0
-      ) {
-        throw new Error(
-          `O campo '${campo}' deve ser um número válido e maior que zero.`,
-        );
+    // 7. Validação da Data (Formato AAAA-MM-DD)
+    if (typeof dataDevolucao !== 'string' || !REGEX_DATA_ISO.test(dataDevolucao) || Number.isNaN(Date.parse(dataDevolucao))) {
+      throw new AppError("A 'dataDevolucao' é obrigatória e deve estar no formato AAAA-MM-DD.");
+    }
+
+    // 8. Persistência e captura de validações registradas no SGBD (Triggers e FKs)
+    try {
+      const insertId = await DevolucaoRepository.cadastrarDevolucao({
+        id_funcionario: idFuncionario,
+        id_item_venda: idItemVenda,
+        tipo,
+        quantidade,
+        motivo: motivo.trim(),
+        reutilizavel,
+        valor_reembolso: valorReembolso,
+        id_venda_troca: idVendaTrocaTratado,
+        data_devolucao: dataDevolucao
+      });
+
+      const devolucaoCadastrada = await DevolucaoRepository.buscarDevolucoesPorId(insertId);
+
+      return {
+        sucesso: true,
+        mensagem: `${tipo === 'TROCA' ? 'Troca' : 'Devolução'} realizada com sucesso!`,
+        dados: devolucaoCadastrada
+      };
+    } catch (error) {
+      // Captura exception lançada pela TRIGGER trg_devolucao_valida
+      if (error.sqlState === '45000') {
+        throw new AppError(error.message || 'Quantidade devolvida excede o total vendido no item.', 400);
       }
-    }
-
-    /*
-    // 5. Validação da Data (se informada, deve ser igual à data atual)
-    if (dataEntrada) {
-      const dataAtualFormatada = new Date().toISOString().split("T")[0];
-      const dataInformada = new Date(dataEntrada);
-      const dataInformadaFormatada = !isNaN(dataInformada)
-        ? dataInformada.toISOString().split("T")[0]
-        : null;
-
-      if (!dataInformadaFormatada || dataInformadaFormatada) {
-        throw new Error("A data deve ser preenchida");
+      // Captura erros de FK indisponível
+      if (error.code === 'ER_NO_REFERENCED_ROW_2') {
+        throw new AppError('Funcionário, Item de Venda ou Venda de Troca referenciado não existe no banco.', 400);
       }
+
+      throw error;
     }
-
-    // 6. Verificação de existência no Banco de Dados
-    const produtoExiste = await ProdutoRepository.findById(codigoProduto);
-    if (!produtoExiste) {
-      throw new Error(
-        `Produto com o código ${codigoProduto} não foi encontrado.`,
-      );
-    }*/
-
-    /*
-    if (idCadastro) {
-        const funcionarioExiste = await funcionarioRepository.buscarPorId(idCadastro);
-        if (!funcionarioExiste) {
-            throw new Error(`Funcionário com o ID ${idCadastro} não foi encontrado.`);
-        }
-    }*/
-
-    // Lógica para salvar a devolução no banco de dados aqui...
-
-    const novaDevolucao = {
-      idCadastro: idCadastro,
-      codigoProduto: codigoProduto,
-      unidades: unidades,
-      motivo: motivo,
-      reutilizacao: reutilizacao,
-      valor: valor,
-      dataEntrada: dataEntrada,
-      etiqueta: etiqueta,
-    };
-
-    const resultado =
-      await DevolucaoRepository.cadastrarDevolucao(novaDevolucao);
-
-    return {
-      sucesso: true,
-      mensagem: "Devolução cadastrada",
-      dados: resultado,
-    };
   }
 }
 
-
-module.exports = new DevolucaoService()
+module.exports = new DevolucaoService();
