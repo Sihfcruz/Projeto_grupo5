@@ -14,7 +14,10 @@ router.post('/', FuncionarioController.cadastrar);
 // Atualizar funcionário
 router.put('/:id', FuncionarioController.atualizar);
 
-// Excluir funcionário
+// Excluir funcionário (softDelete)
 router.delete('/:id', FuncionarioController.excluir);
+
+// Excluir funcionário (hardDelete)
+router.delete('/:id', FuncionarioController.excluirPermanentemente);
 
 module.exports = router;
