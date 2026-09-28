@@ -1,14 +1,13 @@
 const EntradaService = require('./EntradaService');
 
 class EntradaController {
-
     async listar(req, res) {
         try {
-            const entrada = await EntradaService.listarEntradas()
-
+            const entrada = await EntradaService.listarEntradas();
             return res.status(200).json(entrada);
         } catch (error) {
-            return res.status(500).json({
+            const statusCode = error.statusCode || 500;
+            return res.status(statusCode).json({
                 erro: error.message
             });
         }
@@ -17,12 +16,11 @@ class EntradaController {
     async buscarPorId(req, res) {
         try {
             const { id } = req.params;
-
             const entradas = await EntradaService.listarEntradaPorId(id);
-
             return res.status(200).json(entradas);
         } catch (error) {
-            return res.status(500).json({
+            const statusCode = error.statusCode || 500;
+            return res.status(statusCode).json({
                 erro: error.message
             });
         }
@@ -31,15 +29,14 @@ class EntradaController {
     async cadastrar(req, res) {
         try {
             const entrada = await EntradaService.criarEntrada(req.body);
-
             return res.status(201).json(entrada);
         } catch (error) {
-            return res.status(500).json({
+            const statusCode = error.statusCode || 500;
+            return res.status(statusCode).json({
                 erro: error.message
             });
         }
     }
-
 }
 
-module.exports = new EntradaController()
+module.exports = new EntradaController();
