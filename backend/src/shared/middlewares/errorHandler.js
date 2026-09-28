@@ -1,4 +1,30 @@
-const logger = require('../lib/logger')
+// middleware/errorHandler.js
+function errorHandler(err, req, res, next) {
+    const statusCode = err.statusCode || 500;
+
+    // Log estruturado para erros de infraestrutura (500)
+    if (statusCode === 500) {
+        console.error('[CRITICAL ERROR]', {
+            message: err.message,
+            stack: err.stack,
+            path: req.path,
+            method: req.method
+        });
+    }
+
+    return res.status(statusCode).json({
+        sucesso: false,
+        erro: err.message || 'Erro interno do servidor'
+    });
+}
+
+module.exports = errorHandler
+
+
+
+
+
+/*const logger = require('../lib/logger')
 
 const errorHandler = (err, req, res, next) => {
     const requestId = req.id || 'unknown'
@@ -36,6 +62,5 @@ const errorHandler = (err, req, res, next) => {
     res.status(status).json(response)
     
 }
+*/
 
-
-module.exports = errorHandler

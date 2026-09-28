@@ -2,6 +2,62 @@ const pool = require('../../config/database')
 
 class VendaRepository {
 
+    // Adicionar ao VendaRepository.js
+
+    /**
+     * Busca vendas paginadas por cursor (Keyset Pagination)
+     * @param {Object} params
+     * @param {number} params.limite - Quantidade de itens por página
+     * @param {Object|null} params.cursor - Objeto { dataVenda, idVenda }
+     */
+    async buscarVendasPaginadas({ limite = 20, cursor = null }) {
+        // Clamping defensivo: limita a página a no máximo 100 registros para evitar abuso
+        const limiteEfetivo = Math.min(Math.max(1, Number(limite) || 20), 100)
+
+        let sql = `
+        SELECT v.id_venda, v.data_venda, v.id_cliente, v.canal, 
+               v.status, v.valor_total, c.nome AS cliente_nome
+          FROM venda v
+          LEFT JOIN cliente c ON c.id_cliente = v.id_cliente
+    `
+        const params = []
+
+        // Comparação por Tupla no MySQL 5.7+ / 8.0+: (data_venda, id_venda) < (?, ?)
+        if (cursor && cursor.dataVenda && cursor.idVenda) {
+            sql += ` WHERE (v.data_venda, v.id_venda) < (?, ?)`
+            params.push(new Date(cursor.dataVenda), cursor.idVenda)
+        }
+
+        // Ordenação determinística de desempate + probe de N+1 elementos
+        sql += ` ORDER BY v.data_venda DESC, v.id_venda DESC LIMIT ?`
+        params.push(limiteEfetivo + 1)
+
+        const [rows] = await pool.query(sql, params)
+
+        // Detecção de próxima página sem SELECT COUNT(*)
+        const temMais = rows.length > limiteEfetivo
+        if (temMais) {
+            rows.pop() // Remove o (N+1)-ésimo elemento usado apenas para checagem
+        }
+
+        // Extrai a tupla do último item válido para compor o próximo cursor
+        let proximoCursorRaw = null
+        if (temMais && rows.length > 0) {
+            const ultimoRegistro = rows[rows.length - 1]
+            proximoCursorRaw = {
+                dataVenda: ultimoRegistro.data_venda,
+                idVenda: ultimoRegistro.id_venda
+            }
+        }
+
+        return {
+            dados: rows,
+            temMais,
+            proximoCursorRaw,
+            limite: limiteEfetivo
+        }
+    }
+
     async buscarTodasVendas() {
         const [rows] = await pool.query(
             `SELECT v.*, c.nome AS cliente_nome

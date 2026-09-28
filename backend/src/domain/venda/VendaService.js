@@ -1,9 +1,22 @@
 const VendaRepository = require('./VendaRepository')
+const AppError = require('../../shared/errors/AppError')
 
-class AppError extends Error {
-  constructor(message, statusCode = 400) {
-    super(message)
-    this.statusCode = statusCode
+
+// Helpers utilitários para Serialização de Cursor Opaco
+const codificarCursor = (obj) =>
+  Buffer.from(JSON.stringify(obj)).toString('base64url')
+
+const decodificarCursor = (cursorStr) => {
+  try {
+    const jsonStr = Buffer.from(cursorStr, 'base64url').toString('utf8')
+    const parsed = JSON.parse(jsonStr)
+
+    if (!parsed.dataVenda || !parsed.idVenda || isNaN(Date.parse(parsed.dataVenda))) {
+      throw new Error()
+    }
+    return parsed
+  } catch {
+    throw new AppError('O cursor de paginação fornecido é inválido ou foi corrompido.', 400)
   }
 }
 
@@ -26,6 +39,33 @@ const paraCentavos = (valor, campo) => {
 }
 
 class VendaService {
+
+  async listarVendasPaginadas({ limite = 20, cursor = null }) {
+    let cursorDecodificado = null
+
+    if (cursor) {
+      cursorDecodificado = decodificarCursor(cursor)
+    }
+
+    const resultado = await VendaRepository.buscarVendasPaginadas({
+      limite,
+      cursor: cursorDecodificado
+    })
+
+    const proximoCursor = resultado.proximoCursorRaw
+      ? codificarCursor(resultado.proximoCursorRaw)
+      : null
+
+    return {
+      sucesso: true,
+      dados: resultado.dados,
+      paginacao: {
+        limite: resultado.limite,
+        temMais: resultado.temMais,
+        proximoCursor
+      }
+    }
+  }
 
   async listarVendas() {
     const vendas = await VendaRepository.buscarTodasVendas()
