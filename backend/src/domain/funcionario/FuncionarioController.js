@@ -65,6 +65,19 @@ class FuncionarioController {
         }
     }
 
+    async excluirPermanentemente(req, res) {
+        try {
+            const { id } = req.params;
+            const resposta = await FuncionarioService.deletarFuncionario(id);
+
+            return res.status(200).json(resposta);
+        } catch (error) {
+            return res.status(500).json({
+                erro: error.message
+            });
+        }
+    }
+
 }
 
 module.exports = new FuncionarioController();
