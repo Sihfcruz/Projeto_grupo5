@@ -3,22 +3,22 @@ const pool = require('../../config/database')
 class FuncionarioRepository {
 
 
-    async buscarTodosFuncionarios(){
+    async buscarTodosFuncionarios() {
         const [rows] = await pool.query('SELECT * FROM funcionario')
         return rows
     }
 
-    async buscarFuncionarioUnico(id){
+    async buscarFuncionarioUnico(id) {
         const [funcionarioRows] = await pool.query('SELECT * FROM funcionario WHERE id_funcionario = ?', [id])
-        
-        if(funcionarioRows.length === 0) return null
-        
+
+        if (funcionarioRows.length === 0) return null
+
         const funcionario = funcionarioRows[0]
         return funcionario
     }
 
     async cadastrarFuncionario(funcionarioData) {
-        const { nome, dataNascimento, senha, email, idCargo} = funcionarioData
+        const { nome, dataNascimento, senha, email, idCargo } = funcionarioData
 
         const connection = await pool.getConnection()
 
@@ -50,12 +50,18 @@ class FuncionarioRepository {
             values.push(value)
         }
 
-        if(fields.length === 0) return null
+        if (fields.length === 0) return null
 
         values.push(id)
         const query = `UPDATE funcionario SET ${fields.join(', ')} WHERE id = ?`
         const [result] = await pool.query(query, values)
         return result.affectedRows
+    }
+
+    async softDeleteFuncionario(id, dataDesativação) {
+        const [result] = await pool.query(
+            `UPDATE funcionario SET ativo = 0, desativado_em = ? WHERE id_funcionario = ?`, [dataDesativação, id]
+        )
     }
 
     async apagarFuncionario(id) {
