@@ -1,123 +1,114 @@
-
 /* ==========================
    IMPORTAÇÃO DE FONTE
 ========================== */
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap");
 
 /* ==========================
    VARIÁVEIS
 ========================== */
 
 :root {
+  /* Cores */
 
-    /* Cores */
+  --cor-primaria: #082a59;
+  --cor-secundaria: #123d73;
 
-    --cor-primaria: #082A59;
-    --cor-secundaria: #123D73;
+  --cor-branco: #ffffff;
 
-    --cor-branco: #FFFFFF;
+  --cor-fundo: #f4f6fa;
 
-    --cor-fundo: #F4F6FA;
+  --cor-texto: #1f2937;
+  --cor-texto-secundario: #6b7280;
 
-    --cor-texto: #1F2937;
-    --cor-texto-secundario: #6B7280;
+  --cor-borda: #d7dce3;
 
-    --cor-borda: #D7DCE3;
+  --cor-sucesso: #22c55e;
+  --cor-erro: #ef4444;
 
-    --cor-sucesso: #22C55E;
-    --cor-erro: #EF4444;
+  /* Sombras */
 
-    /* Sombras */
+  --sombra-card:
+    0 20px 45px rgba(0, 0, 0, 0.12), 0 4px 10px rgba(0, 0, 0, 0.08);
 
-    --sombra-card:
-        0 20px 45px rgba(0,0,0,.12),
-        0 4px 10px rgba(0,0,0,.08);
+  --sombra-input: 0 0 0 3px rgba(8, 42, 89, 0.15);
 
-    --sombra-input:
-        0 0 0 3px rgba(8,42,89,.15);
+  /* Bordas */
 
-    /* Bordas */
+  --radius-pequeno: 8px;
+  --radius-medio: 12px;
+  --radius-grande: 16px;
 
-    --radius-pequeno: 8px;
-    --radius-medio: 12px;
-    --radius-grande: 16px;
+  /* Transições */
 
-    /* Transições */
-
-    --transicao: .25s ease;
-
+  --transicao: 0.25s ease;
 }
 
 /* ==========================
    RESET
 ========================== */
 
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
 /* ==========================
    HTML
 ========================== */
 
-html{
-    scroll-behavior:smooth;
+html {
+  scroll-behavior: smooth;
 }
 
 /* ==========================
    BODY
 ========================== */
 
-body{
+body {
+  font-family: "Inter", sans-serif;
 
-    font-family:"Inter",sans-serif;
+  background: var(--cor-fundo);
 
-    background:var(--cor-fundo);
+  color: var(--cor-texto);
 
-    color:var(--cor-texto);
+  min-height: 100vh;
 
-    min-height:100vh;
-
-    -webkit-font-smoothing:antialiased;
-    -moz-osx-font-smoothing:grayscale;
-
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 /* ==========================
    IMAGENS
 ========================== */
 
-img{
-    display:block;
-    max-width:100%;
+img {
+  display: block;
+  max-width: 100%;
 }
 
 /* ==========================
    LINKS
 ========================== */
 
-a{
-    text-decoration:none;
-    color:inherit;
+a {
+  text-decoration: none;
+  color: inherit;
 }
 
 /* ==========================
    BOTÕES
 ========================== */
 
-button{
+button {
+  font-family: inherit;
 
-    font-family:inherit;
+  border: none;
 
-    border:none;
+  background: none;
 
-    background:none;
-
-    cursor:pointer;
-
+  cursor: pointer;
 }
 
 /* ==========================
@@ -127,19 +118,15 @@ button{
 input,
 textarea,
 select,
-button{
-
-    font-family:inherit;
-    font-size:1rem;
-
+button {
+  font-family: inherit;
+  font-size: 1rem;
 }
 
 input,
 textarea,
-select{
-
-    outline:none;
-
+select {
+  outline: none;
 }
 
 /* ==========================
@@ -147,70 +134,64 @@ select{
 ========================== */
 
 ul,
-ol{
-    list-style:none;
+ol {
+  list-style: none;
 }
 
 /* ==========================
    SCROLLBAR
 ========================== */
 
-::-webkit-scrollbar{
-    width:10px;
+::-webkit-scrollbar {
+  width: 10px;
 }
 
-::-webkit-scrollbar-track{
-    background:#edf1f6;
+::-webkit-scrollbar-track {
+  background: #edf1f6;
 }
 
-::-webkit-scrollbar-thumb{
-    background:#a7b1c2;
-    border-radius:999px;
+::-webkit-scrollbar-thumb {
+  background: #a7b1c2;
+  border-radius: 999px;
 }
 
-::-webkit-scrollbar-thumb:hover{
-    background:#7e8ba0;
+::-webkit-scrollbar-thumb:hover {
+  background: #7e8ba0;
 }
 
 /* ==========================
    SELEÇÃO DE TEXTO
 ========================== */
 
-::selection{
+::selection {
+  background: var(--cor-primaria);
 
-    background:var(--cor-primaria);
-
-    color:white;
-
+  color: white;
 }
 
 /* ==========================
    CLASSES UTILITÁRIAS
 ========================== */
 
-.container{
-
-    width:min(1200px,90%);
-    margin:0 auto;
-
+.container {
+  width: min(1200px, 90%);
+  margin: 0 auto;
 }
 
-.hidden{
-    display:none !important;
+.hidden {
+  display: none !important;
 }
 
-.flex{
-    display:flex;
+.flex {
+  display: flex;
 }
 
-.center{
-
-    display:flex;
-    justify-content:center;
-    align-items:center;
-
+.center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
-.text-center{
-    text-align:center;
+.text-center {
+  text-align: center;
 }
