@@ -90,7 +90,7 @@ class FuncionarioService {
       dataNascimento: dataNascimento,
       senha: senhaHash,
       email: emailFormatado,
-      cargo: Number(idCargo),
+      idCargo: Number(idCargo),
       ativo: true,
     };
 
