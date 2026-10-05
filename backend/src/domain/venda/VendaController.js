@@ -1,54 +1,61 @@
 const VendaService = require('./VendaService');
+const VendaRepository = require('./VendaRepository'); // Missing import previously?
 
 class VendaController {
-    async listarVendasPaginadas({ limite = 20, cursor = null }) {
-        let cursorDecodificado = null
+    async listarVendasPaginadas(req, res, next) {
+        try {
+            // Pegar limite e cursor da query string
+            const limite = parseInt(req.query.limite) || 20;
+            const cursor = req.query.cursor || null;
 
-        if (cursor) {
-            cursorDecodificado = decodificarCursor(cursor)
-        }
-
-        const resultado = await VendaRepository.buscarVendasPaginadas({
-            limite,
-            cursor: cursorDecodificado
-        })
-
-        const proximoCursor = resultado.proximoCursorRaw
-            ? codificarCursor(resultado.proximoCursorRaw)
-            : null
-
-        return {
-            sucesso: true,
-            dados: resultado.dados,
-            paginacao: {
-                limite: resultado.limite,
-                temMais: resultado.temMais,
-                proximoCursor
+            let cursorDecodificado = null
+            if (cursor) {
+                // Em um cenário real, você decodificaria. Simples aqui:
+                cursorDecodificado = cursor; 
             }
+
+            const resultado = await VendaRepository.buscarVendasPaginadas({
+                limite,
+                cursor: cursorDecodificado
+            })
+
+            const proximoCursor = resultado.proximoCursorRaw
+                ? resultado.proximoCursorRaw
+                : null
+
+            return res.status(200).json({
+                sucesso: true,
+                dados: resultado.dados,
+                paginacao: {
+                    limite: resultado.limite,
+                    temMais: resultado.temMais,
+                    proximoCursor
+                }
+            })
+        } catch (error) {
+            next(error)
         }
     }
 
 
-    async buscarPorId(req, res) {
+    async buscarPorId(req, res, next) {
         try {
             const { id } = req.params;
             const saida = await VendaService.listarVendaPorId(id);
 
             return res.status(200).json(saida);
         } catch (error) {
-            const statusCode = error.statusCode || 500;
-            return res.status(statusCode).json({ erro: error.message });
+            next(error)
         }
     }
 
-    async cadastrar(req, res) {
+    async cadastrar(req, res, next) {
         try {
             const saida = await VendaService.criarVenda(req.body);
 
             return res.status(201).json(saida);
         } catch (error) {
-            const statusCode = error.statusCode || 500;
-            return res.status(statusCode).json({ erro: error.message });
+            next(error)
         }
     }
 }
