@@ -1,7 +1,9 @@
 const DevolucaoRoutes = require('./domain/devolucao/DevolucaoRoutes')
 const EntradaRoutes = require('./domain/entrada/EntradaRoutes')
 const VendaRoutes = require('./domain/venda/VendaRoutes')
-const ProdutoRoutes = require('./domain/produto/ProdutoRoutes');
+const MarcaRoutes = require('./domain/marca/MarcaRoutes');
+const ModeloRoutes = require('./domain/modelo/ModeloRoutes');
+const AjusteRoutes = require('./domain/ajuste/AjusteRoutes');
 const CargoRoutes = require('./domain/cargo/CargoRoutes');
 const FuncionarioRoutes = require('./domain/funcionario/FuncionarioRoutes');
 const AuthRoutes = require('./domain/auth/AuthRoutes')
@@ -58,7 +60,9 @@ app.use(express.urlencoded({ limit: '10mb', extended: true }))
 app.use('/auth', AuthRoutes);
 app.use('/cargo', CargoRoutes);
 app.use('/funcionario', FuncionarioRoutes);
-app.use('/produto', ProdutoRoutes);
+app.use('/marca', MarcaRoutes);
+app.use('/modelo', ModeloRoutes);
+app.use('/ajuste', AjusteRoutes);
 app.use('/entrada', EntradaRoutes);
 app.use('/venda', VendaRoutes);
 app.use('/devolucao', DevolucaoRoutes);
