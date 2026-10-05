@@ -2,19 +2,31 @@ const pool = require('../../config/database')
 
 class FuncionarioRepository {
 
-
     async buscarTodosFuncionarios() {
-        const [rows] = await pool.query('SELECT * FROM funcionario')
+        const [rows] = await pool.query('SELECT * FROM funcionario WHERE deleted_at IS NULL AND ativo = 1')
         return rows
     }
 
     async buscarFuncionarioUnico(id) {
-        const [funcionarioRows] = await pool.query('SELECT * FROM funcionario WHERE id_funcionario = ?', [id])
+        const [funcionarioRows] = await pool.query('SELECT * FROM funcionario WHERE id_funcionario = ? AND deleted_at IS NULL AND ativo = 1', [id])
 
         if (funcionarioRows.length === 0) return null
 
         const funcionario = funcionarioRows[0]
         return funcionario
+    }
+
+    async buscarPorEmail(email) {
+        const [rows] = await pool.query('SELECT * FROM funcionario WHERE email = ? AND deleted_at IS NULL', [email])
+        if (rows.length === 0) return null
+        return rows[0]
+    }
+
+    async buscarCargoPorId(idCargo) {
+        // Assume CargoRepository is handling cargo, but let's implement basic check
+        const [rows] = await pool.query('SELECT * FROM cargo WHERE id_cargo = ?', [idCargo])
+        if (rows.length === 0) return null
+        return rows[0]
     }
 
     async cadastrarFuncionario(funcionarioData) {
@@ -37,8 +49,6 @@ class FuncionarioRepository {
         } finally {
             connection.release()
         }
-
-
     }
 
     async atualizarFuncionario(id, funcionarioData) {
@@ -53,23 +63,17 @@ class FuncionarioRepository {
         if (fields.length === 0) return null
 
         values.push(id)
-        const query = `UPDATE funcionario SET ${fields.join(', ')} WHERE id = ?`
+        const query = `UPDATE funcionario SET ${fields.join(', ')} WHERE id_funcionario = ?`
         const [result] = await pool.query(query, values)
         return result.affectedRows
     }
 
-    async softDeleteFuncionario(id, dataDesativação) {
+    async softDeleteFuncionario(id, dataDesativacao) {
         const [result] = await pool.query(
-            `UPDATE funcionario SET ativo = 0, desativado_em = ? WHERE id_funcionario = ?`, [dataDesativação, id]
+            `UPDATE funcionario SET ativo = 0, deleted_at = ? WHERE id_funcionario = ?`, [dataDesativacao, id]
         )
-    }
-
-    async apagarFuncionario(id) {
-        const [result] = await pool.query('DELETE FROM funcionario WHERE id = ?', [id])
         return result.affectedRows
     }
-
 }
-
 
 module.exports = new FuncionarioRepository()
