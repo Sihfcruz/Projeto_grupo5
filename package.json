@@ -1,0 +1,8 @@
+{
+  "dependencies": {
+    "@scalar/express-api-reference": "^0.10.26"
+  },
+  "devDependencies": {
+    "swagger-autogen": "^2.23.7"
+  }
+}
