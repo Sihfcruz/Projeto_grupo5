@@ -4,7 +4,9 @@
   "description": "API de Gestão de Estoque",
   "main": "src/server.js",
   "scripts": {
+    "prestart": "npm run docs:generate",
     "start": "node src/server.js",
+    "docs:generate": "node src/swagger.js",
     "test": "jest --runInBand",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage"

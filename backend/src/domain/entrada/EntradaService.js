@@ -1,7 +1,7 @@
 const EntradasRepository = require('./EntradasRepository');
 const SkuRepository = require('../sku/SkuRepository');
 const EntradaValidator = require('./EntradaSchema');
-const AppError = require('../../errors/AppError');
+const AppError = require('../../shared/errors/AppError');
 
 class EntradaService {
     /**

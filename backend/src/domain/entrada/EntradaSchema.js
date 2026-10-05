@@ -1,4 +1,4 @@
-const AppError = require('../../errors/AppError');
+const AppError = require('../../shared/errors/AppError');
 
 const REGEX_DATA_ISO = /^\d{4}-\d{2}-\d{2}$/;
 

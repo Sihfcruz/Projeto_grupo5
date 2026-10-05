@@ -15,6 +15,8 @@ const cors = require('cors')
 const helmet = require('helmet')
 const rateLimit = require('express-rate-limit')
 const compression = require('compression')
+const path = require('path')
+const { apiReference } = require('@scalar/express-api-reference')
 
 const app = express()
 const errorHandler = require('./shared/middlewares/errorHandler')
@@ -23,6 +25,14 @@ const requestLogger = require('./shared/middlewares/requestLogger')
 
 // Helmet - headers de segurança HTTP (configurado para permitir imagens)
 app.use(helmet())
+
+// Scalar requires inline scripts for its interactive reference UI.
+app.use((req, res, next) => {
+    if (req.path === '/api-docs' || req.path.startsWith('/api-docs/')) {
+        res.removeHeader('Content-Security-Policy')
+    }
+    next()
+})
 
 app.use(compression())
 
@@ -55,6 +65,15 @@ app.use(cors(corsOptions))
 // parsers
 app.use(express.json({ limit: '10mb' }))
 app.use(express.urlencoded({ limit: '10mb', extended: true }))
+
+app.get('/api-docs/openapi.json', (req, res) => {
+    res.sendFile(path.join(__dirname, 'swagger-output.json'))
+})
+app.use('/api-docs', apiReference({
+    spec: {
+        url: '/api-docs/openapi.json'
+    }
+}))
 
 //Rotas
 app.use('/auth', AuthRoutes);
@@ -95,4 +114,3 @@ app.use('/', router)
 app.use(errorHandler)
 
 module.exports = app
-

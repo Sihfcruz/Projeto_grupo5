@@ -3,7 +3,7 @@ const router = express.Router();
 const VendaController = require('./VendaController');
 
 // Listar todas as saídas
-router.get('/', VendaController.listar);
+router.get('/', VendaController.listarVendasPaginadas);
 
 // Buscar saída por ID
 router.get('/:id', VendaController.buscarPorId);

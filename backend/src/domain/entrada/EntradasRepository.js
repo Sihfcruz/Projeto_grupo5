@@ -1,4 +1,4 @@
-const db = require('../config/database'); // Instância da pool (ex: mysql2/promise)
+const db = require('../../config/database'); // Instância da pool (ex: mysql2/promise)
 
 class EntradasRepository {
     async buscarTodasEntradas() {
