@@ -1,6 +1,6 @@
 const DevolucaoRoutes = require('./domain/devolucao/DevolucaoRoutes')
 const EntradaRoutes = require('./domain/entrada/EntradaRoutes')
-const SaidaRoutes = require('./domain/saida/SaidaRoutes')
+const VendaRoutes = require('./domain/venda/VendaRoutes')
 const ProdutoRoutes = require('./domain/produto/ProdutoRoutes');
 const CargoRoutes = require('./domain/cargo/CargoRoutes');
 const FuncionarioRoutes = require('./domain/funcionario/FuncionarioRoutes');
@@ -60,7 +60,7 @@ app.use('/cargo', CargoRoutes);
 app.use('/funcionario', FuncionarioRoutes);
 app.use('/produto', ProdutoRoutes);
 app.use('/entrada', EntradaRoutes);
-app.use('/saida', SaidaRoutes);
+app.use('/venda', VendaRoutes);
 app.use('/devolucao', DevolucaoRoutes);
 app.use('/estoque', EstoqueRoutes)
 
