@@ -2,13 +2,9 @@ const express = require('express');
 const router = express.Router();
 const VendaController = require('./VendaController');
 
-// Listar todas as saídas
 router.get('/', VendaController.listarVendasPaginadas);
-
-// Buscar saída por ID
 router.get('/:id', VendaController.buscarPorId);
-
-// Cadastrar nova saída
 router.post('/', VendaController.cadastrar);
+router.patch('/:id/status', VendaController.atualizarStatus);
 
 module.exports = router;

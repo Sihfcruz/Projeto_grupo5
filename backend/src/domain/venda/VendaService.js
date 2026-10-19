@@ -22,6 +22,14 @@ const decodificarCursor = (cursorStr) => {
 
 const CANAIS = ['LOJA', 'ONLINE']
 const FORMAS_PAGAMENTO = ['DINHEIRO', 'PIX', 'CARTAO_CREDITO', 'CARTAO_DEBITO', 'BOLETO', 'VALE_TROCA']
+const STATUS_VENDA = ['ABERTA', 'PAGA', 'ENVIADA', 'ENTREGUE', 'CANCELADA']
+const TRANSICOES = {
+  ABERTA: ['PAGA', 'CANCELADA'],
+  PAGA: ['ENVIADA', 'ENTREGUE', 'CANCELADA'],
+  ENVIADA: ['ENTREGUE'],
+  ENTREGUE: [],
+  CANCELADA: []
+}
 const STATUS_PAGAMENTO = ['PENDENTE', 'APROVADO', 'RECUSADO', 'ESTORNADO']
 
 const ehInteiroPositivo = (v) => Number.isInteger(v) && v > 0
@@ -260,6 +268,7 @@ class VendaService {
         })
 
         await VendaRepository.inserirItens(connection, novaVendaId, itensCalculados)
+        await VendaRepository.baixarEstoque(connection, itensCalculados)
 
         await VendaRepository.inserirPagamentos(
           connection,
@@ -285,10 +294,6 @@ class VendaService {
     } catch (error) {
       if (error instanceof AppError) throw error
 
-      // Trigger de estoque (SIGNAL SQLSTATE '45000')
-      if (error.sqlState === '45000') {
-        throw new AppError(error.sqlMessage, 409)
-      }
       if (error.code === 'ER_NO_REFERENCED_ROW_2') {
         throw new AppError('Funcionário, cliente ou SKU informado não existe.', 400)
       }
@@ -299,6 +304,42 @@ class VendaService {
         throw new AppError('Conflito com outra venda em andamento. Tente novamente.', 409)
       }
       throw error
+    }
+  }
+
+  /**
+   * Fluxo de status: ABERTA -> PAGA -> ENVIADA -> ENTREGUE.
+   * Pode cancelar enquanto ABERTA ou PAGA (devolve o estoque).
+   */
+  async atualizarStatus(id, novoStatus) {
+    const idNumerico = Number(id)
+    if (!ehInteiroPositivo(idNumerico)) throw new AppError('Id inválido', 400)
+    if (!STATUS_VENDA.includes(novoStatus)) {
+      throw new AppError(`O campo 'status' deve ser um de: ${STATUS_VENDA.join(', ')}.`)
+    }
+
+    await VendaRepository.executarEmTransacao(async (connection) => {
+      const venda = await VendaRepository.buscarStatusParaAtualizar(connection, idNumerico)
+      if (!venda) throw new AppError('Venda não encontrada', 404)
+
+      const permitidos = TRANSICOES[venda.status] || []
+      if (!permitidos.includes(novoStatus)) {
+        throw new AppError(`Não é possível mudar a venda de ${venda.status} para ${novoStatus}.`, 409)
+      }
+
+      if (novoStatus === 'CANCELADA') {
+        if (await VendaRepository.possuiDevolucoes(connection, idNumerico)) {
+          throw new AppError('Venda com devoluções registradas não pode ser cancelada.', 409)
+        }
+        await VendaRepository.reporEstoqueDaVenda(connection, idNumerico)
+      }
+      await VendaRepository.atualizarStatus(connection, idNumerico, novoStatus)
+    })
+
+    return {
+      sucesso: true,
+      mensagem: 'Status da venda atualizado com sucesso!',
+      dados: await VendaRepository.buscarVendaPorId(idNumerico)
     }
   }
 }

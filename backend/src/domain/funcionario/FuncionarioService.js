@@ -1,12 +1,6 @@
 const FuncionarioRepository = require('./FuncionariosRepository');
 const bcrypt = require("bcrypt");
-
-class AppError extends Error {
-  constructor(message, statusCode = 400) {
-    super(message);
-    this.statusCode = statusCode;
-  }
-}
+const AppError = require("../../shared/errors/AppError");
 
 class FuncionarioService {
   #EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -82,6 +76,20 @@ class FuncionarioService {
         422,
       );
     }
+
+    if (senha.trim().length < 8) {
+      throw new AppError("A senha deve ter no mínimo 8 caracteres", 400);
+    }
+
+    if (!Number.isInteger(Number(idCargo)) || Number(idCargo) <= 0) {
+      throw new AppError("ID de cargo inválido", 400);
+    }
+    const cargoExistente =
+      await FuncionarioRepository.buscarCargoPorId(Number(idCargo));
+    if (!cargoExistente) throw new AppError("Cargo informado não existe", 404);
+
+    const emailEmUso = await FuncionarioRepository.buscarPorEmail(emailFormatado);
+    if (emailEmUso) throw new AppError("E-mail já está em uso", 409);
 
     const senhaHash = await bcrypt.hash(senha.trim(), this.#SALT_ROUNDS);
 
@@ -199,16 +207,26 @@ class FuncionarioService {
     }
 
     const funcionarioExistente =
-      await FuncionarioRepository.buscarFuncionarioUnico(idNumerico);
-    if (!funcionarioExistente || !funcionarioExistente.ativo) {
-      throw new AppError("Funcionário não encontrado ou inativo", 404);
+      await FuncionarioRepository.buscarFuncionarioPorIdIncluindoInativos(idNumerico);
+    if (!funcionarioExistente) {
+      throw new AppError("Funcionário não encontrado", 404);
     }
 
-    await FuncionarioRepository.softDeleteFuncionario(idNumerico, new Date());
+    try {
+      await FuncionarioRepository.excluirPermanentemente(idNumerico);
+    } catch (error) {
+      if (error.code === "ER_ROW_IS_REFERENCED_2") {
+        throw new AppError(
+          "Funcionário possui vendas/entradas registradas e não pode ser excluído permanentemente. Use a desativação.",
+          409,
+        );
+      }
+      throw error;
+    }
 
     return {
       sucesso: true,
-      mensagem: "Funcionario desativado com sucesso",
+      mensagem: "Funcionario excluído permanentemente",
     };
   }
 }

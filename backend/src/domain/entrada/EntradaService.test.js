@@ -1,154 +1,60 @@
-// Adicione no topo do arquivo de teste
-jest.mock('../../config/database', () => ({
-  query: jest.fn(),
-  execute: jest.fn(),
-}));
+const EntradaService = require('./EntradaService').constructor
 
-jest.mock('./EntradasRepository');
-jest.mock('../produto/ProdutoRepository');
+const mk = () => {
+  const entradasRepo = { buscarTodasEntradas: jest.fn(), buscarEntradaPorId: jest.fn(), create: jest.fn() }
+  const skuRepo = { findById: jest.fn() }
+  return { entradasRepo, skuRepo, service: new EntradaService(entradasRepo, skuRepo) }
+}
 
-const EntradasRepository = require('./EntradasRepository');
-const ProdutoRepository = require('../produto/ProdutoRepository');
-const EntradaService = require('./EntradaService');
-
-const dadosValidos = () => ({
-  idCadastro: 1,
-  codigoProduto: 10,
-  quantidade: 5,
-  pesoTotal: 2.5,
-  dataEntrada: new Date().toISOString(),
-  dataValidade: null,
-  lote: 'LOTE-001',
-  etiqueta: 'ETQ-001',
-  valor: 99.9,
-});
+const dados = () => ({
+  idFuncionario: 1, idSku: 2, quantidade: 10, valorTotal: 500.5, dataEntrada: '2026-01-15', lote: ' L1 ',
+})
 
 describe('EntradaService', () => {
-  beforeEach(() => {
-    jest.clearAllMocks();
-  });
+  it('lista vazia retorna 200 com total 0 (não erro)', async () => {
+    const { service, entradasRepo } = mk()
+    entradasRepo.buscarTodasEntradas.mockResolvedValue([])
+    await expect(service.listarEntradas()).resolves.toMatchObject({ sucesso: true, total: 0 })
+  })
 
-  describe('listarEntradas', () => {
-    it('deve lançar AppError 404 quando o repositório não retorna dados', async () => {
-      EntradasRepository.buscarTodasEntradas.mockResolvedValue(null);
+  it('valida id', async () => {
+    const { service } = mk()
+    await expect(service.listarEntradaPorId('x')).rejects.toMatchObject({ statusCode: 400 })
+  })
 
-      await expect(EntradaService.listarEntradas()).rejects.toMatchObject({
-        message: 'Nenhum produto encontrado',
-        statusCode: 404,
-      });
-    });
+  it('404 quando não encontra', async () => {
+    const { service, entradasRepo } = mk()
+    entradasRepo.buscarEntradaPorId.mockResolvedValue(null)
+    await expect(service.listarEntradaPorId(3)).rejects.toMatchObject({ statusCode: 404 })
+  })
 
-    it('deve retornar sucesso, dados e total quando existem entradas', async () => {
-      const entradasFake = [{ id: 1 }, { id: 2 }];
-      EntradasRepository.buscarTodasEntradas.mockResolvedValue(entradasFake);
+  it.each([
+    ['quantidade', 0], ['quantidade', 1.5], ['valorTotal', -1], ['lote', ''], ['dataEntrada', '15/01/2026'], ['idSku', 'a'],
+  ])('rejeita %s inválido (%p)', async (campo, valor) => {
+    const { service } = mk()
+    await expect(service.criarEntrada({ ...dados(), [campo]: valor })).rejects.toMatchObject({ statusCode: 400 })
+  })
 
-      const resultado = await EntradaService.listarEntradas();
+  it('404 quando o SKU não existe', async () => {
+    const { service, skuRepo } = mk()
+    skuRepo.findById.mockResolvedValue(null)
+    await expect(service.criarEntrada(dados())).rejects.toMatchObject({ statusCode: 404 })
+  })
 
-      expect(resultado).toEqual({
-        sucesso: true,
-        dados: entradasFake,
-        total: 2,
-      });
-    });
-  });
+  it('cria a entrada (lote com trim)', async () => {
+    const { service, skuRepo, entradasRepo } = mk()
+    skuRepo.findById.mockResolvedValue({ idSku: 2 })
+    entradasRepo.create.mockResolvedValue(8)
+    entradasRepo.buscarEntradaPorId.mockResolvedValue({ idEntrada: 8 })
+    const r = await service.criarEntrada(dados())
+    expect(entradasRepo.create).toHaveBeenCalledWith(expect.objectContaining({ lote: 'L1' }))
+    expect(r.dados).toEqual({ idEntrada: 8 })
+  })
 
-  describe('listarEntradaPorId', () => {
-    it('deve lançar erro quando o id é inválido', async () => {
-      await expect(EntradaService.listarEntradaPorId('abc')).rejects.toThrow('Id inválido');
-    });
-
-    it('deve lançar AppError 404 quando a entrada não é encontrada', async () => {
-      EntradasRepository.buscarEntradaPorId.mockResolvedValue(null);
-
-      await expect(EntradaService.listarEntradaPorId(1)).rejects.toMatchObject({
-        message: 'Nenhum produto encontrado',
-        statusCode: 404,
-      });
-    });
-
-    it('deve retornar a entrada quando encontrada', async () => {
-      const entradaFake = { id: 1, lote: 'LOTE-001' };
-      EntradasRepository.buscarEntradaPorId.mockResolvedValue(entradaFake);
-
-      const resultado = await EntradaService.listarEntradaPorId(1);
-
-      expect(resultado).toEqual({ sucesso: true, dados: entradaFake });
-    });
-  });
-
-  describe('criarEntrada', () => {
-    it.each([
-      'idCadastro',
-      'codigoProduto',
-      'quantidade',
-      'pesoTotal',
-      'dataEntrada',
-      'lote',
-      'etiqueta',
-      'valor',
-    ])('deve lançar erro quando o campo obrigatório "%s" não é informado', async (campo) => {
-      const dados = dadosValidos();
-      delete dados[campo];
-
-      await expect(EntradaService.criarEntrada(dados)).rejects.toThrow(
-        `O campo '${campo}' é obrigatório e deve ser preenchido.`,
-      );
-    });
-
-    it('deve lançar erro quando lote ou etiqueta não são strings', async () => {
-      const dados = { ...dadosValidos(), lote: 123 };
-
-      await expect(EntradaService.criarEntrada(dados)).rejects.toThrow(
-        "Os campos 'lote' e 'etiqueta' devem ser do tipo texto.",
-      );
-    });
-
-    it('deve lançar erro quando um campo numérico não é um número válido maior que zero', async () => {
-      const dados = { ...dadosValidos(), pesoTotal: -1 };
-
-      await expect(EntradaService.criarEntrada(dados)).rejects.toThrow(
-        "O campo 'pesoTotal' deve ser um número válido e maior que zero.",
-      );
-    });
-
-    it('deve lançar erro quando a data de entrada é inválida', async () => {
-      const dados = { ...dadosValidos(), dataEntrada: 'data-invalida' };
-
-      await expect(EntradaService.criarEntrada(dados)).rejects.toThrow(
-        'A data de entrada deve ser preenchida',
-      );
-    });
-
-    it('deve lançar erro quando o produto não existe', async () => {
-      const dados = dadosValidos();
-      ProdutoRepository.findById.mockResolvedValue(null);
-
-      await expect(EntradaService.criarEntrada(dados)).rejects.toThrow(
-        `Produto com o código ${dados.codigoProduto} não foi encontrado.`,
-      );
-    });
-
-    it('deve cadastrar a entrada quando todos os dados são válidos', async () => {
-      const dados = dadosValidos();
-      ProdutoRepository.findById.mockResolvedValue({ id: dados.codigoProduto });
-      EntradasRepository.create.mockResolvedValue({ id: 1, ...dados });
-
-      const resultado = await EntradaService.criarEntrada(dados);
-
-      expect(ProdutoRepository.findById).toHaveBeenCalledWith(dados.codigoProduto);
-      expect(EntradasRepository.create).toHaveBeenCalledTimes(1);
-
-      // Observação (não é bug bloqueante, mas vale confirmar a intenção):
-      // o serviço sempre grava a data ATUAL do servidor em dataEntrada,
-      // ignorando o valor recebido em `dados.dataEntrada` (ver EntradaService.js).
-      const entradaEnviada = EntradasRepository.create.mock.calls[0][0];
-      expect(entradaEnviada.dataEntrada).toBe(new Date().toISOString().split('T')[0]);
-
-      expect(resultado).toEqual({
-        sucesso: true,
-        mensagem: 'Entrada cadastrada com sucesso!',
-        dados: { id: 1, ...dados },
-      });
-    });
-  });
-});
+  it('lote duplicado vira 409', async () => {
+    const { service, skuRepo, entradasRepo } = mk()
+    skuRepo.findById.mockResolvedValue({ idSku: 2 })
+    entradasRepo.create.mockRejectedValue({ code: 'ER_DUP_ENTRY' })
+    await expect(service.criarEntrada(dados())).rejects.toMatchObject({ statusCode: 409 })
+  })
+})

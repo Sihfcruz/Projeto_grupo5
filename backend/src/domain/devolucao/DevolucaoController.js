@@ -1,35 +1,29 @@
 const DevolucaoService = require('./DevolucaoService');
 
 class DevolucaoController {
-    async listar(req, res) {
+    async listar(req, res, next) {
         try {
-            const resultado = await DevolucaoService.listarDevolucoes();
-            return res.status(200).json(resultado);
+            return res.status(200).json(await DevolucaoService.listarDevolucoes());
         } catch (error) {
-            const statusCode = error.statusCode || 500;
-            return res.status(statusCode).json({ erro: error.message });
+            next(error);
         }
     }
 
-    async buscarPorId(req, res) {
+    async buscarPorId(req, res, next) {
         try {
-            const { id } = req.params;
-            const resultado = await DevolucaoService.listarDevolucaoPorId(id);
-            return res.status(200).json(resultado);
+            return res.status(200).json(await DevolucaoService.listarDevolucaoPorId(req.params.id));
         } catch (error) {
-            const statusCode = error.statusCode || 500;
-            return res.status(statusCode).json({ erro: error.message });
+            next(error);
         }
     }
 
-    async cadastrar(req, res) {
+    async cadastrar(req, res, next) {
         try {
-            // Corrigido de .cadastrar para .criarDevolucao
-            const resultado = await DevolucaoService.criarDevolucao(req.body);
+            // O funcionário responsável é sempre o usuário logado
+            const resultado = await DevolucaoService.criarDevolucao({ ...(req.body || {}), idFuncionario: req.usuario.id });
             return res.status(201).json(resultado);
         } catch (error) {
-            const statusCode = error.statusCode || 500;
-            return res.status(statusCode).json({ erro: error.message });
+            next(error);
         }
     }
 }

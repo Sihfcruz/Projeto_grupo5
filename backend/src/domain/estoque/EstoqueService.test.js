@@ -1,60 +1,30 @@
-// Adicione no topo do arquivo de teste
-jest.mock('../../config/database', () => ({
-  query: jest.fn(),
-  execute: jest.fn(),
-}));
+jest.mock('./EstoqueRepository')
+const Repo = require('./EstoqueRepository')
+const EstoqueService = require('./EstoqueService')
 
-jest.mock('./EstoqueRepository');
-
-const EstoqueRepository = require('./EstoqueRepository');
-const EstoqueService = require('./EstoqueService');
+beforeEach(() => jest.resetAllMocks())
 
 describe('EstoqueService', () => {
-  beforeEach(() => {
-    jest.clearAllMocks();
-  });
+  it('lista normalizando flags para boolean', async () => {
+    Repo.listarTodos.mockResolvedValue([{ id_sku: 1, abaixo_do_minimo: 1, ativo: 1 }, { id_sku: 2, abaixo_do_minimo: 0, ativo: 1 }])
+    const r = await EstoqueService.listarEstoque()
+    expect(r.total).toBe(2)
+    expect(r.dados[0].abaixo_do_minimo).toBe(true)
+    expect(r.dados[1].abaixo_do_minimo).toBe(false)
+  })
 
-  describe('listarEstoque', () => {
-    it('deve lançar AppError 404 quando o repositório não retorna dados (null)', async () => {
-      EstoqueRepository.listarTodos.mockResolvedValue(null);
+  it('buscarPorId valida o id', async () => {
+    await expect(EstoqueService.buscarPorId('abc')).rejects.toMatchObject({ statusCode: 400 })
+  })
 
-      await expect(EstoqueService.listarEstoque()).rejects.toMatchObject({
-        message: 'Nenhum produto encontrado',
-        statusCode: 404,
-      });
-    });
+  it('buscarPorId retorna 404 quando não existe', async () => {
+    Repo.buscarPorSkuId.mockResolvedValue(null)
+    await expect(EstoqueService.buscarPorId(5)).rejects.toMatchObject({ statusCode: 404 })
+  })
 
-    it('deve lançar AppError 404 quando o repositório retorna undefined', async () => {
-      EstoqueRepository.listarTodos.mockResolvedValue(undefined);
-
-      await expect(EstoqueService.listarEstoque()).rejects.toMatchObject({
-        statusCode: 404,
-      });
-    });
-
-    it('deve retornar sucesso, dados e total quando existem itens no estoque', async () => {
-      const estoqueFake = [{ id: 1 }, { id: 2 }, { id: 3 }];
-      EstoqueRepository.listarTodos.mockResolvedValue(estoqueFake);
-
-      const resultado = await EstoqueService.listarEstoque();
-
-      expect(resultado).toEqual({
-        sucesso: true,
-        dados: estoqueFake,
-        total: 3,
-      });
-    });
-
-    it('deve retornar total 0 quando o estoque é um array vazio (é "truthy", não cai no 404)', async () => {
-      EstoqueRepository.listarTodos.mockResolvedValue([]);
-
-      const resultado = await EstoqueService.listarEstoque();
-
-      expect(resultado).toEqual({
-        sucesso: true,
-        dados: [],
-        total: 0,
-      });
-    });
-  });
-});
+  it('buscarPorId retorna o item', async () => {
+    Repo.buscarPorSkuId.mockResolvedValue({ id_sku: 5, abaixo_do_minimo: 0, ativo: 1 })
+    const r = await EstoqueService.buscarPorId('5')
+    expect(r.dados).toMatchObject({ id_sku: 5, abaixo_do_minimo: false, ativo: true })
+  })
+})

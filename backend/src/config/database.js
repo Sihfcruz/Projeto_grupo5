@@ -1,6 +1,6 @@
 const mysql = require('mysql2/promise')
 const config = require('./environment')
-const logger = require('../shared/lib/logger')
+const logger = require('../shared-00/lib/logger')
 
 
 const pool = mysql.createPool({
@@ -17,7 +17,7 @@ const pool = mysql.createPool({
 })
 
 //teste conexão
-pool.getConnection() 
+pool.getConnection()
     .then((connection) => {
         logger.info('Conexão com o banco de dados estabelecida')
         connection.release()

@@ -41,6 +41,7 @@ class EntradasRepository {
         return rows[0] || null;
     }
 
+    // Insere a entrada e soma a quantidade no estoque do SKU (mesma transação)
     async create(dados) {
         const {
             idFuncionario,
@@ -53,31 +54,31 @@ class EntradasRepository {
             notaFiscal
         } = dados;
 
-        const query = `
-      INSERT INTO entrada (
-        id_funcionario,
-        id_fornecedor,
-        id_sku,
-        quantidade,
-        valor_total,
-        data_entrada,
-        lote,
-        nota_fiscal
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-    `;
+        const connection = await db.getConnection();
 
-        const [result] = await db.execute(query, [
-            idFuncionario,
-            idFornecedor,
-            idSku,
-            quantidade,
-            valorTotal,
-            dataEntrada,
-            lote,
-            notaFiscal
-        ]);
+        try {
+            await connection.beginTransaction();
 
-        return result.insertId;
+            const [result] = await connection.query(
+                `INSERT INTO entrada
+                    (id_funcionario, id_fornecedor, id_sku, quantidade, valor_total, data_entrada, lote, nota_fiscal)
+                 VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+                [idFuncionario, idFornecedor, idSku, quantidade, valorTotal, dataEntrada, lote, notaFiscal]
+            );
+
+            await connection.query(
+                'UPDATE sku SET quantidade_estoque = quantidade_estoque + ? WHERE id_sku = ?',
+                [quantidade, idSku]
+            );
+
+            await connection.commit();
+            return result.insertId;
+        } catch (error) {
+            await connection.rollback();
+            throw error;
+        } finally {
+            connection.release();
+        }
     }
 }
 

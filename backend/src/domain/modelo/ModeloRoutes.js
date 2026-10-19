@@ -1,6 +1,4 @@
-const express = require('express');
-const router = express.Router();
-const ModeloController = require('./ModeloController');
-router.get('/', ModeloController.listar.bind(ModeloController));
-router.post('/', ModeloController.cadastrar.bind(ModeloController));
-module.exports = router;
+const { criarRotas } = require('../../shared/lib/crud')
+const ModeloController = require('./ModeloController')
+
+module.exports = criarRotas(ModeloController, require('./ModeloConfig').rotas || {})
