@@ -3,82 +3,13 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="Nômade: gestão de estoque de calçados." />
     <title>Entrar · Nômade</title>
-    <link rel="icon" href="src/images/favicon.svg" type="image/svg+xml" />
-    <link rel="stylesheet" href="src/styles/global.css" />
-    <script type="module" src="src/scripts/login.js"></script>
+    <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
   </head>
-  <body>
-    <main class="login-layout">
-      <section class="login-art" aria-label="Nômade">
-        <a class="brand" href="login.html"
-          ><span class="brand-mark">N</span
-          ><span>Nômade<small>Gestão de estoque</small></span></a
-        >
-        <div class="login-copy">
-          <p class="eyebrow">ORGANIZAÇÃO EM CADA PASSO</p>
-          <h1>Seu estoque.<br />Sua equipe.<br />Tudo no lugar.</h1>
-          <p>
-            Uma visão clara da sua loja, do primeiro recebimento à próxima
-            venda.
-          </p>
-        </div>
-        <small>Estoque · catálogo · movimentações</small>
-      </section>
-      <section class="login-side">
-        <div class="login-box">
-          <p class="eyebrow">BEM-VINDO AO NÔMADE</p>
-          <h1>Acesse sua conta</h1>
-          <p class="subtitle">
-            Entre com seu e-mail e sua senha de funcionário.
-          </p>
-          <p id="login-info" class="notice" hidden></p>
-          <p id="login-error" class="error" role="alert" hidden></p>
-          <form id="form-login">
-            <label class="field" for="email"
-              >E-mail<input
-                id="email"
-                name="email"
-                type="email"
-                autocomplete="username"
-                required
-                maxlength="150"
-                placeholder="voce@exemplo.com" /></label
-            ><label class="field" for="senha"
-              >Senha<span class="password-wrap"
-                ><input
-                  id="senha"
-                  name="senha"
-                  type="password"
-                  autocomplete="current-password"
-                  required
-                /><button
-                  id="show-password"
-                  type="button"
-                  aria-controls="senha"
-                  aria-pressed="false"
-                >
-                  Mostrar
-                </button></span
-              ></label
-            ><button class="button" id="login-submit" type="submit">
-              Entrar →
-            </button>
-          </form>
-          <div class="login-divider">CONHEÇA O SISTEMA</div>
-          <button class="button secondary" type="button" id="demo-button">
-            Visualizar demonstração
-          </button>
-          <p class="login-foot">
-            Demonstração com dados fictícios e sem gravações.
-          </p>
-        </div>
-      </section>
-    </main>
-    <noscript
-      ><p class="noscript">
-        Ative o JavaScript para entrar no sistema.
-      </p></noscript
-    >
+  <body data-page="login">
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+    <noscript>Ative o JavaScript para utilizar o Nômade.</noscript>
   </body>
 </html>
