@@ -1,40 +1,29 @@
 const EntradaService = require('./EntradaService');
 
 class EntradaController {
-    async listar(req, res) {
+    async listar(req, res, next) {
         try {
-            const entrada = await EntradaService.listarEntradas();
-            return res.status(200).json(entrada);
+            return res.status(200).json(await EntradaService.listarEntradas());
         } catch (error) {
-            const statusCode = error.statusCode || 500;
-            return res.status(statusCode).json({
-                erro: error.message
-            });
+            next(error);
         }
     }
 
-    async buscarPorId(req, res) {
+    async buscarPorId(req, res, next) {
         try {
-            const { id } = req.params;
-            const entradas = await EntradaService.listarEntradaPorId(id);
-            return res.status(200).json(entradas);
+            return res.status(200).json(await EntradaService.listarEntradaPorId(req.params.id));
         } catch (error) {
-            const statusCode = error.statusCode || 500;
-            return res.status(statusCode).json({
-                erro: error.message
-            });
+            next(error);
         }
     }
 
-    async cadastrar(req, res) {
+    async cadastrar(req, res, next) {
         try {
-            const entrada = await EntradaService.criarEntrada(req.body);
+            // O funcionário responsável é sempre o usuário logado
+            const entrada = await EntradaService.criarEntrada({ ...(req.body || {}), idFuncionario: req.usuario.id });
             return res.status(201).json(entrada);
         } catch (error) {
-            const statusCode = error.statusCode || 500;
-            return res.status(statusCode).json({
-                erro: error.message
-            });
+            next(error);
         }
     }
 }

@@ -123,7 +123,7 @@ class VendaRepository {
     // Enquanto a transação não termina, outra venda do mesmo SKU espera.
     async bloquearSkus(connection, idsSku) {
         const [rows] = await connection.query(
-            `SELECT id_sku, preco_venda
+            `SELECT id_sku, preco_venda, quantidade_estoque
                FROM sku
               WHERE id_sku IN (?) AND ativo = TRUE AND deleted_at IS NULL
               ORDER BY id_sku
@@ -164,7 +164,58 @@ class VendaRepository {
         return result.insertId
     }
 
-    // O trigger trg_item_venda_valida_estoque roda a cada linha inserida
+    // Baixa o estoque dos itens (SKUs já travados com FOR UPDATE). Falha se faltar saldo.
+    async baixarEstoque(connection, itens) {
+        for (const item of itens) {
+            const [result] = await connection.query(
+                `UPDATE sku SET quantidade_estoque = quantidade_estoque - ?
+                  WHERE id_sku = ? AND quantidade_estoque >= ?`,
+                [item.quantidade, item.idSku, item.quantidade]
+            )
+            if (result.affectedRows === 0) {
+                const AppError = require('../../shared/errors/AppError')
+                throw new AppError(`Estoque insuficiente para o SKU ${item.idSku}.`, 409)
+            }
+        }
+    }
+
+    // Devolve ao estoque os itens de uma venda (cancelamento)
+    async reporEstoqueDaVenda(connection, idVenda) {
+        await connection.query(
+            `UPDATE sku s
+               JOIN item_venda iv ON iv.id_sku = s.id_sku
+                SET s.quantidade_estoque = s.quantidade_estoque + iv.quantidade
+              WHERE iv.id_venda = ?`,
+            [idVenda]
+        )
+    }
+
+    async possuiDevolucoes(connection, idVenda) {
+        const [rows] = await connection.query(
+            `SELECT 1 FROM devolucao d JOIN item_venda iv ON iv.id_item_venda = d.id_item_venda
+              WHERE iv.id_venda = ? LIMIT 1`,
+            [idVenda]
+        )
+        return rows.length > 0
+    }
+
+    async buscarStatusParaAtualizar(connection, idVenda) {
+        const [rows] = await connection.query(
+            'SELECT id_venda, status FROM venda WHERE id_venda = ? FOR UPDATE', [idVenda]
+        )
+        return rows[0] || null
+    }
+
+    async atualizarStatus(connection, idVenda, status) {
+        await connection.query('UPDATE venda SET status = ? WHERE id_venda = ?', [status, idVenda])
+        // pagamentos pendentes viram estornados no cancelamento
+        if (status === 'CANCELADA') {
+            await connection.query(
+                "UPDATE pagamento SET status = 'ESTORNADO' WHERE id_venda = ? AND status = 'APROVADO'", [idVenda]
+            )
+        }
+    }
+
     async inserirItens(connection, idVenda, itens) {
         const valores = itens.map((i) => [
             idVenda,

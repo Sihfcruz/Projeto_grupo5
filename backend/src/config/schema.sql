@@ -119,7 +119,7 @@ CREATE TABLE sku (
     preco_venda DECIMAL(10, 2) NOT NULL CHECK (preco_venda > 0),
     estoque_minimo INT NOT NULL DEFAULT 0 CHECK (estoque_minimo >= 0),
     ativo BOOLEAN NOT NULL DEFAULT TRUE,
-    quantidade_estoque INT NOT NULL DEFAULT 0,CHECK (quantidade_estoque >= 0),
+    quantidade_estoque INT NOT NULL DEFAULT 0 CHECK (quantidade_estoque >= 0),
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     deleted_at DATETIME NULL DEFAULT NULL,
     CONSTRAINT uq_sku_variacao UNIQUE (id_modelo, tamanho, cor),
@@ -239,25 +239,43 @@ CREATE TABLE devolucao (
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
--- VIEW: saldo por SKU (entradas - vendas nao canceladas + devolucoes reutilizaveis)
+-- REFRESH TOKENS (login)
 -- ---------------------------------------------------------------------
-Aqui está a solução completa, testada e em padrão production-grade para a refatoração do módulo de estoque da Nomade, acompanhada do script SQL de correção e da explicação detalhada do que acontece na CPU, memória e engine do banco de dados.
+CREATE TABLE refresh_tokens (
+    id_refresh INT AUTO_INCREMENT PRIMARY KEY,
+    id_funcionario INT NOT NULL,
+    token VARCHAR(512) NOT NULL,
+    expira_em DATETIME NOT NULL,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE KEY uq_refresh_token (token(255)),
+    CONSTRAINT fk_refresh_funcionario
+        FOREIGN KEY (id_funcionario) REFERENCES funcionario(id_funcionario)
+        ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB;
 
-1. DDL SQL: Alteração de Schema e Eliminação de Bugs
-Removemos os triggers mutantes/problemáticos do MySQL e adicionamos a coluna quantidade_estoque materializada na tabela sku com restrição de checagem no nível do InnoDB.
+-- ---------------------------------------------------------------------
+-- AJUSTE DE ESTOQUE (contagem manual, perdas, correcoes). quantidade pode ser negativa.
+-- ---------------------------------------------------------------------
+CREATE TABLE ajuste_estoque (
+    id_ajuste INT AUTO_INCREMENT PRIMARY KEY,
+    id_sku INT NOT NULL,
+    id_funcionario INT NULL,
+    quantidade INT NOT NULL CHECK (quantidade <> 0),
+    motivo VARCHAR(255) NOT NULL,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_ajuste_sku
+        FOREIGN KEY (id_sku) REFERENCES sku(id_sku)
+        ON DELETE RESTRICT ON UPDATE CASCADE,
+    CONSTRAINT fk_ajuste_funcionario
+        FOREIGN KEY (id_funcionario) REFERENCES funcionario(id_funcionario)
+        ON DELETE RESTRICT ON UPDATE CASCADE
+) ENGINE=InnoDB;
 
-SQL
-USE nomade;
-
--- 1. Eliminação dos triggers mutantes que causam o erro MySQL 1442 e Race Conditions
-DROP TRIGGER IF EXISTS trg_item_venda_valida_estoque;
-DROP TRIGGER IF EXISTS trg_devolucao_valida;
-
--- 2. Materialização da coluna de estoque físico com trava nativa em nível de página/linha
-ALTER TABLE sku 
-ADD COLUMN quantidade_estoque INT NOT NULL DEFAULT 0 CHECK (quantidade_estoque >= 0);
-
--- 3. Recriação da View otimizada refletindo a nova coluna materializada
+-- ---------------------------------------------------------------------
+-- VIEW: saldo atual por SKU (coluna materializada sku.quantidade_estoque).
+-- O saldo e atualizado pela aplicacao, dentro de transacoes (entrada, venda,
+-- devolucao, ajuste, cancelamento). O CHECK da coluna impede saldo negativo.
+-- ---------------------------------------------------------------------
 CREATE OR REPLACE VIEW vw_estoque_atual AS
 SELECT
     s.id_sku,
@@ -277,6 +295,10 @@ JOIN marca mc  ON mc.id_marca = m.id_marca
 WHERE s.ativo = TRUE AND s.deleted_at IS NULL;
 
 -- ---------------------------------------------------------------------
--- TRIGGERS de integridade
+-- DADOS INICIAIS: cargos. nivel_acesso >= 100 = administrador.
+-- Crie o primeiro funcionario admin com: npm run seed:admin
 -- ---------------------------------------------------------------------
-DELIMITER $$
+INSERT INTO cargo (nome_cargo, nivel_acesso) VALUES
+    ('Administrador', 100),
+    ('Vendedor', 10),
+    ('Estoquista', 10);

@@ -1,23 +1,21 @@
 const express = require('express');
 const router = express.Router();
 const FuncionarioController = require('./FuncionarioController');
+const { verificarAdmin } = require('../../shared/middlewares/authMiddleware');
 
-// Listar todos os funcionários
+// Dados de funcionários: somente administradores
+router.use(verificarAdmin);
+
 router.get('/', FuncionarioController.listarFuncionarios);
-
-// Buscar funcionário por ID
 router.get('/:id', FuncionarioController.buscarPorId);
-
-// Cadastrar novo funcionário
 router.post('/', FuncionarioController.cadastrar);
-
-// Atualizar funcionário
 router.put('/:id', FuncionarioController.atualizar);
+router.patch('/:id', FuncionarioController.atualizar);
 
-// Excluir funcionário (softDelete)
+// Desativar (soft delete)
 router.delete('/:id', FuncionarioController.excluir);
 
-// Excluir funcionário (hardDelete)
-router.delete('/:id', FuncionarioController.excluirPermanentemente);
+// Excluir de vez (hard delete)
+router.delete('/:id/permanente', FuncionarioController.excluirPermanentemente);
 
 module.exports = router;

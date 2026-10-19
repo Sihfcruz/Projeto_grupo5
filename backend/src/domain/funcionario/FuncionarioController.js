@@ -1,83 +1,29 @@
 const FuncionarioService = require('./FuncionarioService');
 
 class FuncionarioController {
-
-    async listarFuncionarios(req, res) {
-        try {
-            const funcionarios = await FuncionarioService.listarFuncionarios();
-
-            return res.status(200).json(funcionarios);
-        } catch (error) {
-            return res.status(500).json({
-                erro: error.message
-            });
-        }
+    async listarFuncionarios(req, res, next) {
+        try { return res.status(200).json(await FuncionarioService.listarFuncionarios()); } catch (e) { next(e); }
     }
 
-    async buscarPorId(req, res) {
-        try {
-            const { id } = req.params;
-            const funcionario = await FuncionarioService.buscarFuncionarioPorId(id);
-
-            return res.status(200).json(funcionario);
-        } catch (error) {
-            return res.status(500).json({
-                erro: error.message
-            });
-        }
+    async buscarPorId(req, res, next) {
+        try { return res.status(200).json(await FuncionarioService.buscarFuncionarioPorId(req.params.id)); } catch (e) { next(e); }
     }
 
-    async cadastrar(req, res) {
-        try {
-            const funcionario = await FuncionarioService.cadastrarFuncionario(req.body);
-
-            return res.status(201).json(funcionario);
-        } catch (error) {
-            return res.status(500).json({
-                erro: error.message
-            });
-        }
+    async cadastrar(req, res, next) {
+        try { return res.status(201).json(await FuncionarioService.cadastrarFuncionario(req.body || {})); } catch (e) { next(e); }
     }
 
-    async atualizar(req, res) {
-        try {
-            const { id } = req.params;
-            const funcionario = await FuncionarioService.atualizarFuncionario(id, req.body);
-
-            return res.status(200).json(funcionario);
-        } catch (error) {
-            return res.status(500).json({
-                erro: error.message
-            });
-        }
+    async atualizar(req, res, next) {
+        try { return res.status(200).json(await FuncionarioService.atualizarFuncionario(req.params.id, req.body || {})); } catch (e) { next(e); }
     }
 
-    async excluir(req, res) {
-        try {
-            const { id } = req.params;
-            const resposta = await FuncionarioService.deletarFuncionario(id);
-
-            return res.status(200).json(resposta);
-        } catch (error) {
-            return res.status(500).json({
-                erro: error.message
-            });
-        }
+    async excluir(req, res, next) {
+        try { return res.status(200).json(await FuncionarioService.deletarFuncionario(req.params.id)); } catch (e) { next(e); }
     }
 
-    async excluirPermanentemente(req, res) {
-        try {
-            const { id } = req.params;
-            const resposta = await FuncionarioService.deletarFuncionario(id);
-
-            return res.status(200).json(resposta);
-        } catch (error) {
-            return res.status(500).json({
-                erro: error.message
-            });
-        }
+    async excluirPermanentemente(req, res, next) {
+        try { return res.status(200).json(await FuncionarioService.deletarFuncionarioPermanentemente(req.params.id)); } catch (e) { next(e); }
     }
-
 }
 
 module.exports = new FuncionarioController();

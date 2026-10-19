@@ -1,6 +1,4 @@
-const express = require('express');
-const router = express.Router();
-const MarcaController = require('./MarcaController');
-router.get('/', MarcaController.listar.bind(MarcaController));
-router.post('/', MarcaController.cadastrar.bind(MarcaController));
-module.exports = router;
+const { criarRotas } = require('../../shared/lib/crud')
+const MarcaController = require('./MarcaController')
+
+module.exports = criarRotas(MarcaController, require('./MarcaConfig').rotas || {})

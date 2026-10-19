@@ -18,14 +18,10 @@ class EntradaService {
     async listarEntradas() {
         const entradas = await this.entradasRepo.buscarTodasEntradas();
 
-        if (!entradas || entradas.length === 0) {
-            throw new AppError('Nenhuma entrada encontrada', 404);
-        }
-
         return {
             sucesso: true,
-            dados: entradas,
-            total: entradas.length
+            dados: entradas || [],
+            total: (entradas || []).length
         };
     }
 
@@ -94,6 +90,7 @@ class EntradaService {
             if (error.code === 'ER_DUP_ENTRY') {
                 throw new AppError('Já existe uma entrada com este lote para este SKU.', 409);
             }
+            if (error instanceof AppError) throw error;
             if (error.code === 'ER_NO_REFERENCED_ROW_2') {
                 throw new AppError('Funcionário ou Fornecedor informado não existe.', 400);
             }

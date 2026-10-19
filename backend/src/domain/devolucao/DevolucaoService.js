@@ -1,12 +1,5 @@
 const DevolucaoRepository = require('./DevolucaoRepository');
-
-class AppError extends Error {
-  constructor(message, statusCode = 400) {
-    super(message);
-    this.statusCode = statusCode;
-    this.name = 'AppError';
-  }
-}
+const AppError = require('../../shared/errors/AppError');
 
 const ehInteiroPositivo = (valor) => Number.isInteger(valor) && valor > 0;
 const REGEX_DATA_ISO = /^\d{4}-\d{2}-\d{2}$/;
@@ -15,14 +8,10 @@ class DevolucaoService {
   async listarDevolucoes() {
     const devolucoes = await DevolucaoRepository.buscarTodasDevolucoes();
 
-    if (!devolucoes || devolucoes.length === 0) {
-      throw new AppError('Nenhuma devolução encontrada', 404);
-    }
-
     return {
       sucesso: true,
-      dados: devolucoes,
-      total: devolucoes.length
+      dados: devolucoes || [],
+      total: (devolucoes || []).length
     };
   }
 
@@ -128,11 +117,8 @@ class DevolucaoService {
         dados: devolucaoCadastrada
       };
     } catch (error) {
-      // Captura exception lançada pela TRIGGER trg_devolucao_valida
-      if (error.sqlState === '45000') {
-        throw new AppError(error.message || 'Quantidade devolvida excede o total vendido no item.', 400);
-      }
-      // Captura erros de FK indisponível
+      if (error instanceof AppError) throw error;
+      // FK inexistente
       if (error.code === 'ER_NO_REFERENCED_ROW_2') {
         throw new AppError('Funcionário, Item de Venda ou Venda de Troca referenciado não existe no banco.', 400);
       }

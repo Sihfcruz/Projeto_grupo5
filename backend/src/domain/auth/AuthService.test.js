@@ -1,178 +1,102 @@
-/**
- * Testes unitários para AuthService.
- *
- * ATENÇÃO — bugs encontrados no arquivo original (AuthService.js) que afetam estes testes:
- *
- * 1. O arquivo nunca faz `require('jsonwebtoken')`, mas usa `jwt.sign` / `jwt.verify`.
- *    Sem isso, TODA chamada a gerarAcessToken/gerarRefreshToken/login/renovarToken
- *    lança "ReferenceError: jwt is not defined" em produção.
- *    Aqui a variável `jwt` é "shimada" como global só para conseguirmos testar a
- *    lógica de negócio — isso NÃO conserta o bug real, só permite validar o resto
- *    do fluxo. Corrija adicionando `const jwt = require('jsonwebtoken');` no topo
- *    do serviço.
- *
- * 2. Em `login()`, o accessToken é gerado com `this.gerarRefreshToken(funcionario)`
- *    em vez de `this.gerarAcessToken(funcionario)` — provavelmente um erro de
- *    copiar/colar. O teste de login abaixo documenta esse comportamento atual.
- *
- * 3. Em `renovarToken()`, a linha
- *      const funcionario = { id: funcionario.id, role: funcionario.id_cargo }
- *    referencia `funcionario` antes dele existir (TDZ), o que sempre lança
- *    "ReferenceError: Cannot access 'funcionario' before initialization".
- *    O teste marcado como "[bug conhecido]" documenta esse comportamento.
- */
+jest.mock('./AuthFuncionarioRepository', () => ({
+  findByEmail: jest.fn(),
+  findById: jest.fn(),
+  salvarRefresh: jest.fn(),
+  buscarRefreshToken: jest.fn(),
+  removerRefreshToken: jest.fn(),
+}))
+jest.mock('bcrypt', () => ({ compare: jest.fn() }))
 
-// Adicione no topo do arquivo de teste
-jest.mock('../../config/database', () => ({
-  query: jest.fn(),
-  execute: jest.fn(),
-}));
+const bcrypt = require('bcrypt')
+const jwt = require('jsonwebtoken')
+const Repo = require('./AuthFuncionarioRepository')
+const AuthService = require('./AuthFuncionarioService')
 
-jest.mock('jsonwebtoken');
-jest.mock('./AuthFuncionarioRepository');
+const funcionario = (nivel = 10) => ({
+  id_funcionario: 7, nome_completo: 'Ana', email: 'ana@x.com', senha: 'hash', id_cargo: 2, nivel_acesso: nivel,
+})
 
-const jwt = require('jsonwebtoken');
-// Shim necessário por conta do bug #1 acima.
-global.jwt = jwt;
+beforeEach(() => jest.resetAllMocks())
 
-const AuthRepository = require('./AuthFuncionarioRepository');
-const AuthService = require('./AuthFuncionarioService');
+describe('AuthService.login', () => {
+  it('rejeita email/senha ausentes com 400', async () => {
+    await expect(AuthService.login(undefined, 'x')).rejects.toMatchObject({ statusCode: 400 })
+    await expect(AuthService.login('a@a.com', '')).rejects.toMatchObject({ statusCode: 400 })
+  })
 
-describe('AuthService', () => {
-  beforeEach(() => {
-    jest.clearAllMocks();
-    process.env.JWT_SECRET = 'access-secret';
-    process.env.JWT_REFRESH_SECRET = 'refresh-secret';
-    process.env.JWT_EXPIRES_IN = '1h';
-  });
+  it('retorna 401 para email inexistente', async () => {
+    Repo.findByEmail.mockResolvedValue(undefined)
+    await expect(AuthService.login('a@a.com', 'x')).rejects.toMatchObject({ statusCode: 401, message: 'Credenciais inválidas' })
+  })
 
-  describe('gerarAcessToken', () => {
-    it('deve chamar jwt.sign com o payload, secret e expiração corretos', () => {
-      jwt.sign.mockReturnValue('access-token-fake');
-      const user = { id: 1, role: 'ADMIN' };
+  it('retorna 401 para senha errada (mesma mensagem)', async () => {
+    Repo.findByEmail.mockResolvedValue(funcionario())
+    bcrypt.compare.mockResolvedValue(false)
+    await expect(AuthService.login('a@a.com', 'x')).rejects.toMatchObject({ statusCode: 401, message: 'Credenciais inválidas' })
+  })
 
-      const token = AuthService.gerarAcessToken(user);
+  it('gera tokens com o id correto, papel funcionario e salva o refresh por ~7 dias', async () => {
+    Repo.findByEmail.mockResolvedValue(funcionario(10))
+    bcrypt.compare.mockResolvedValue(true)
 
-      expect(jwt.sign).toHaveBeenCalledWith(
-        { id: user.id, role: user.role },
-        process.env.JWT_SECRET,
-        { expiresIn: process.env.JWT_EXPIRES_IN },
-      );
-      expect(token).toBe('access-token-fake');
-    });
-  });
+    const r = await AuthService.login('  ANA@x.com ', 'senha123')
 
-  describe('gerarRefreshToken', () => {
-    it('deve chamar jwt.sign com o payload, secret, expiração e algoritmo ES256', () => {
-      jwt.sign.mockReturnValue('refresh-token-fake');
-      const user = { id: 1 };
+    expect(Repo.findByEmail).toHaveBeenCalledWith('ana@x.com')
+    const payload = jwt.verify(r.accessToken, process.env.JWT_SECRET)
+    expect(payload).toMatchObject({ id: 7, papel: 'funcionario' })
+    expect(r.funcionario).toMatchObject({ id: 7, nome: 'Ana', papel: 'funcionario' })
 
-      const token = AuthService.gerarRefreshToken(user);
+    const [id, token, expira] = Repo.salvarRefresh.mock.calls[0]
+    expect(id).toBe(7)
+    expect(token).toBe(r.refreshToken)
+    const dias = (expira - Date.now()) / 86400000
+    expect(dias).toBeGreaterThan(6.9)
+    expect(dias).toBeLessThan(7.1)
+  })
 
-      expect(jwt.sign).toHaveBeenCalledWith(
-        { id: user.id },
-        process.env.JWT_REFRESH_SECRET,
-        { expiresIn: process.env.JWT_EXPIRES_IN, algorithm: 'ES256' },
-      );
-      expect(token).toBe('refresh-token-fake');
-    });
-  });
+  it('cargo com nivel_acesso >= 100 vira admin', async () => {
+    Repo.findByEmail.mockResolvedValue(funcionario(100))
+    bcrypt.compare.mockResolvedValue(true)
+    const r = await AuthService.login('a@a.com', 'x')
+    expect(jwt.verify(r.accessToken, process.env.JWT_SECRET).papel).toBe('admin')
+  })
+})
 
-  describe('login', () => {
-    it('deve lançar erro quando o funcionário não é encontrado', async () => {
-      AuthRepository.findByEmail.mockResolvedValue(null);
+describe('AuthService.renovarToken', () => {
+  it('rejeita token malformado com 401', async () => {
+    await expect(AuthService.renovarToken('lixo')).rejects.toMatchObject({ statusCode: 401 })
+  })
 
-      await expect(
-        AuthService.login('naoexiste@email.com', '123456'),
-      ).rejects.toThrow('Credenciais inválidas');
-      expect(AuthRepository.findByEmail).toHaveBeenCalledWith('naoexiste@email.com');
-    });
+  it('rejeita token que não está no banco (ou expirado) com 401', async () => {
+    Repo.findByEmail.mockResolvedValue(funcionario())
+    bcrypt.compare.mockResolvedValue(true)
+    const { refreshToken } = await AuthService.login('a@a.com', 'x')
+    Repo.buscarRefreshToken.mockResolvedValue(undefined)
+    await expect(AuthService.renovarToken(refreshToken)).rejects.toMatchObject({ statusCode: 401 })
+  })
 
-    it('deve gerar tokens, salvar o refresh token e retornar os dados do funcionário', async () => {
-      const funcionario = {
-        id: 10,
-        nome: 'João',
-        email: 'joao@email.com',
-        id_cargo: 2,
-      };
-      AuthRepository.findByEmail.mockResolvedValue(funcionario);
-      AuthRepository.salvarRefresh.mockResolvedValue();
-      jwt.sign.mockReturnValue('token-fake');
+  it('rotaciona: remove o antigo e devolve novos tokens', async () => {
+    Repo.findByEmail.mockResolvedValue(funcionario())
+    bcrypt.compare.mockResolvedValue(true)
+    const { refreshToken } = await AuthService.login('a@a.com', 'x')
 
-      const resultado = await AuthService.login('joao@email.com', '123456');
+    Repo.buscarRefreshToken.mockResolvedValue({ token: refreshToken })
+    Repo.findById.mockResolvedValue(funcionario())
 
-      expect(resultado).toEqual({
-        funcionario: {
-          id: funcionario.id,
-          nome: funcionario.nome,
-          email: funcionario.email,
-          role: funcionario.id_cargo,
-        },
-        acessToken: 'token-fake',
-        refreshToken: 'token-fake',
-      });
+    const novo = await AuthService.renovarToken(refreshToken)
 
-      // BUG #2: como login() usa gerarRefreshToken() duas vezes, jwt.sign é chamado
-      // duas vezes com o secret/algoritmo de REFRESH — nunca com JWT_SECRET.
-      expect(jwt.sign).toHaveBeenCalledTimes(2);
-      expect(jwt.sign).toHaveBeenNthCalledWith(
-        1,
-        { id: funcionario.id },
-        process.env.JWT_REFRESH_SECRET,
-        { expiresIn: process.env.JWT_EXPIRES_IN, algorithm: 'ES256' },
-      );
+    expect(Repo.removerRefreshToken).toHaveBeenCalledWith(refreshToken)
+    expect(novo.accessToken).toBeDefined()
+    expect(novo.refreshToken).not.toBe(refreshToken)
+  })
+})
 
-      expect(AuthRepository.salvarRefresh).toHaveBeenCalledWith(
-        funcionario.id,
-        'token-fake',
-        expect.any(Date),
-      );
-    });
-
-    it('deve salvar o refresh token com validade de aproximadamente 7 dias', async () => {
-      const funcionario = { id: 1, nome: 'Ana', email: 'ana@email.com', id_cargo: 1 };
-      AuthRepository.findByEmail.mockResolvedValue(funcionario);
-      AuthRepository.salvarRefresh.mockResolvedValue();
-      jwt.sign.mockReturnValue('token-fake');
-
-      const antes = Date.now();
-      await AuthService.login('ana@email.com', 'senha');
-
-      const [, , expiraEm] = AuthRepository.salvarRefresh.mock.calls[0];
-      const diffDias = (expiraEm.getTime() - antes) / (1000 * 60 * 60 * 24);
-
-      expect(diffDias).toBeGreaterThan(6.9);
-      expect(diffDias).toBeLessThan(7.1);
-    });
-  });
-
-  describe('renovarToken', () => {
-    it('deve lançar erro quando o refresh token não está cadastrado', async () => {
-      AuthRepository.buscarRefreshToken.mockResolvedValue(null);
-
-      await expect(AuthService.renovarToken('token-invalido')).rejects.toThrow(
-        'Refresh token expirado',
-      );
-    });
-
-    // BUG #3: mesmo com um registro válido, o método sempre lança um ReferenceError
-    // porque `funcionario` é referenciado antes de ser inicializado. Este teste
-    // documenta o comportamento atual; remova-o quando o bug for corrigido.
-    it('[bug conhecido] lança erro mesmo com um registro de refresh token válido', async () => {
-      AuthRepository.buscarRefreshToken.mockResolvedValue({ token: 'token-valido' });
-      jwt.verify.mockReturnValue({ id: 1, id_cargo: 2 });
-
-      await expect(AuthService.renovarToken('token-valido')).rejects.toThrow();
-    });
-  });
-
-  describe('logout', () => {
-    it('deve remover o refresh token informado', async () => {
-      AuthRepository.removerRefreshToken.mockResolvedValue();
-
-      await AuthService.logout('algum-refresh-token');
-
-      expect(AuthRepository.removerRefreshToken).toHaveBeenCalledWith('algum-refresh-token');
-    });
-  });
-});
+describe('AuthService.logout', () => {
+  it('exige o refresh token', async () => {
+    await expect(AuthService.logout(undefined)).rejects.toMatchObject({ statusCode: 400 })
+  })
+  it('remove o token', async () => {
+    await AuthService.logout('abc')
+    expect(Repo.removerRefreshToken).toHaveBeenCalledWith('abc')
+  })
+})

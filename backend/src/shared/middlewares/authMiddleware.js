@@ -1,25 +1,26 @@
 const jwt = require('jsonwebtoken')
+const config = require('../../config/environment')
 
+// Exige "Authorization: Bearer <token>". Preenche req.usuario = { id, papel }
 function verificarToken(req, res, next) {
-    const authHeader = req.headers['authorization'] 
-    const token = authHeader && authHeader.split(' ')[1]
+    const authHeader = req.headers['authorization']
+    const [esquema, token] = authHeader ? authHeader.split(' ') : []
 
-    if(!token) {
-        return res.status(401).json({ mensagem: 'Token não fornecido' })
+    if (esquema !== 'Bearer' || !token) {
+        return res.status(401).json({ sucesso: false, erro: 'Token não fornecido' })
     }
 
-    jwt.verify(token, process.env.JWT_SECRET, (erro, payload) => {
-        if(erro) {
-            return res.status(403).json({ mensagem: 'Token inválido ou expirado '})
-        }
-        req.usuario = payload
-        next()
-    })
+    try {
+        req.usuario = jwt.verify(token, config.jwt.secret)
+        return next()
+    } catch (erro) {
+        return res.status(401).json({ sucesso: false, erro: 'Token inválido ou expirado' })
+    }
 }
 
 function verificarAdmin(req, res, next) {
     if (req.usuario?.papel !== 'admin') {
-        return res.status(403).json({ mensagem: 'Acesso restrito a administrador' })
+        return res.status(403).json({ sucesso: false, erro: 'Acesso restrito a administrador' })
     }
     next()
 }

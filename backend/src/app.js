@@ -1,13 +1,13 @@
-const DevolucaoRoutes = require('./domain/devolucao/DevolucaoRoutes')
-const EntradaRoutes = require('./domain/entrada/EntradaRoutes')
-const VendaRoutes = require('./domain/venda/VendaRoutes')
-const MarcaRoutes = require('./domain/marca/MarcaRoutes');
-const ModeloRoutes = require('./domain/modelo/ModeloRoutes');
-const AjusteRoutes = require('./domain/ajuste/AjusteRoutes');
-const CargoRoutes = require('./domain/cargo/CargoRoutes');
-const FuncionarioRoutes = require('./domain/funcionario/FuncionarioRoutes');
-const AuthRoutes = require('./domain/auth/AuthRoutes')
-const EstoqueRoutes = require('./domain/estoque/EstoqueRoutes');
+const DevolucaoRoutes = require('./domain-00/devolucao/DevolucaoRoutes')
+const EntradaRoutes = require('./domain-00/entrada/EntradaRoutes')
+const VendaRoutes = require('./domain-00/venda/VendaRoutes')
+const MarcaRoutes = require('./domain-00/marca/MarcaRoutes');
+const ModeloRoutes = require('./domain-00/modelo/ModeloRoutes');
+const AjusteRoutes = require('./domain-00/ajuste/AjusteRoutes');
+const CargoRoutes = require('./domain-00/cargo/CargoRoutes');
+const FuncionarioRoutes = require('./domain-00/funcionario/FuncionarioRoutes');
+const AuthRoutes = require('./domain-00/auth/AuthRoutes')
+const EstoqueRoutes = require('./domain-00/estoque/EstoqueRoutes');
 
 const express = require('express')
 const router = express.Router()
@@ -19,9 +19,9 @@ const path = require('path')
 const { apiReference } = require('@scalar/express-api-reference')
 
 const app = express()
-const errorHandler = require('./shared/middlewares/errorHandler')
-const requestIdMiddleware = require('./shared/middlewares/requestId')
-const requestLogger = require('./shared/middlewares/requestLogger')
+const errorHandler = require('./shared-00/middlewares/errorHandler')
+const requestIdMiddleware = require('./shared-00/middlewares/requestId')
+const requestLogger = require('./shared-00/middlewares/requestLogger')
 
 // Helmet - headers de segurança HTTP (configurado para permitir imagens)
 app.use(helmet())
