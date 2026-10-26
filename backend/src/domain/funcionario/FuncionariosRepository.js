@@ -55,7 +55,12 @@ class FuncionarioRepository {
         const fields = []
         const values = []
 
-        for (const [key, value] of Object.entries(funcionarioData)) {
+        // camelCase da API -> coluna do banco (whitelist, evita SQL injection por nome de campo)
+        const COLUNAS = { nome: 'nome_completo', dataNascimento: 'data_nascimento', senha: 'senha', email: 'email', idCargo: 'id_cargo' }
+
+        for (const [campo, value] of Object.entries(funcionarioData)) {
+            const key = COLUNAS[campo]
+            if (!key) continue
             fields.push(`${key} = ?`)
             values.push(value)
         }
@@ -65,6 +70,16 @@ class FuncionarioRepository {
         values.push(id)
         const query = `UPDATE funcionario SET ${fields.join(', ')} WHERE id_funcionario = ?`
         const [result] = await pool.query(query, values)
+        return result.affectedRows
+    }
+
+    async buscarFuncionarioPorIdIncluindoInativos(id) {
+        const [rows] = await pool.query('SELECT * FROM funcionario WHERE id_funcionario = ?', [id])
+        return rows[0] || null
+    }
+
+    async excluirPermanentemente(id) {
+        const [result] = await pool.query('DELETE FROM funcionario WHERE id_funcionario = ?', [id])
         return result.affectedRows
     }
 

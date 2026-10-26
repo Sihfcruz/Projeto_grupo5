@@ -1,66 +1,32 @@
-// middleware/errorHandler.js
-function errorHandler(err, req, res, next) {
-    const statusCode = err.statusCode || 500;
+const logger = require('../lib/logger')
 
-    // Log estruturado para erros de infraestrutura (500)
-    if (statusCode === 500) {
-        console.error('[CRITICAL ERROR]', {
+// Middleware de erro central. Deve ser o último do app.
+function errorHandler(err, req, res, next) { // eslint-disable-line no-unused-vars
+    // JSON inválido no body
+    if (err.type === 'entity.parse.failed') {
+        return res.status(400).json({ sucesso: false, erro: 'JSON inválido no corpo da requisição' })
+    }
+
+    const statusCode = err.statusCode || 500
+
+    if (statusCode >= 500) {
+        logger.error({
+            requestId: req.id,
             message: err.message,
             stack: err.stack,
             path: req.path,
             method: req.method
-        });
+        })
     }
+
+    // Em 500 nunca expõe detalhes internos (SQL, stack, etc.)
+    const mensagem = statusCode >= 500 ? 'Erro interno do servidor' : err.message
 
     return res.status(statusCode).json({
         sucesso: false,
-        erro: err.message || 'Erro interno do servidor'
-    });
+        erro: mensagem,
+        requestId: req.id
+    })
 }
 
 module.exports = errorHandler
-
-
-
-
-
-/*const logger = require('../lib/logger')
-
-const errorHandler = (err, req, res, next) => {
-    const requestId = req.id || 'unknown'
-
-    //Log erro
-    logger.error({
-        requestId,
-        message: err.message,
-        stack: err.stack,
-        status: err.status || 500,
-        path: req.path,
-        method: req.method
-    })
-
-    //Status padrão
-    const status = err.status || 500
-
-    //Em produção, não exponha stack traces
-    const isProduction = process.env.NODE_ENV === 'production'
-
-    const response = {
-        sucesso: false,
-        messagem: err.mensagem || err.message || 'Erro interno do servidor',
-        requestId
-    }
-
-    //Apenas em desenvolvimento, inclua Stack
-    if (!isProduction && err.stack) {
-        response.debug = {
-            stack: err.stack,
-            details: err.details
-        }
-    }
-
-    res.status(status).json(response)
-    
-}
-*/
-

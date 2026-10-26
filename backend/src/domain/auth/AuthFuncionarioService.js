@@ -1,81 +1,92 @@
-const AuthRepository = require('./AuthFuncionarioRepository')
-const jwt = require('jsonwebtoken')
+const crypto = require('crypto')
 const bcrypt = require('bcrypt')
+const AuthRepository = require('./AuthFuncionarioRepository')
+const jwtUtils = require('../../shared/lib/jwtUtils')
+const config = require('../../config/environment')
+const AppError = require('../../shared/errors/AppError')
 
 class AuthService {
 
-    gerarAcessToken(user) {
-        // user.role para papel (admin, funcionario) ou apenas id_cargo
-        const papel = user.id_cargo === 1 ? 'admin' : 'funcionario';
-        return jwt.sign(
-            { id: user.id, papel: papel },
-            process.env.JWT_SECRET,
-            { expiresIn: process.env.JWT_EXPIRES_IN }
-        )
-    } 
-
-    gerarRefreshToken(user){
-        return jwt.sign(
-            { id: user.id },
-            process.env.JWT_REFRESH_SECRET,
-            { expiresIn: process.env.JWT_EXPIRES_IN }
-        )
+    papelDoFuncionario(funcionario) {
+        return Number(funcionario.nivel_acesso) >= config.nivelAdmin ? 'admin' : 'funcionario'
     }
 
-    async login(email, senha) {
-        const funcionario = await AuthRepository.findByEmail(email)
-        if(!funcionario) {
-            const error = new Error('Credenciais inválidas');
-            error.statusCode = 401;
-            throw error;
-        }
+    gerarAccessToken(funcionario) {
+        return jwtUtils.gerarAccessToken({
+            id: funcionario.id_funcionario,
+            papel: this.papelDoFuncionario(funcionario)
+        })
+    }
 
-        const senhaValida = await bcrypt.compare(senha, funcionario.senha)
-        if(!senhaValida) {
-            const error = new Error('Credenciais inválidas');
-            error.statusCode = 401;
-            throw error;
-        }
+    gerarRefreshToken(funcionario) {
+        // jti garante token único mesmo em logins no mesmo segundo
+        return jwtUtils.gerarRefreshToken({
+            id: funcionario.id_funcionario,
+            jti: crypto.randomUUID()
+        })
+    }
 
-        const acessToken = this.gerarAcessToken(funcionario)
+    async emitirTokens(funcionario) {
+        const accessToken = this.gerarAccessToken(funcionario)
         const refreshToken = this.gerarRefreshToken(funcionario)
 
         const expiraEm = new Date()
-        expiraEm.setDate(expiraEm.getDate() + 7)
-        await AuthRepository.salvarRefresh(funcionario.id_funcionario || funcionario.id, refreshToken, expiraEm)
+        expiraEm.setDate(expiraEm.getDate() + config.jwt.refreshExpiryDays)
+        await AuthRepository.salvarRefresh(funcionario.id_funcionario, refreshToken, expiraEm)
+
+        return { accessToken, refreshToken }
+    }
+
+    async login(email, senha) {
+        if (typeof email !== 'string' || typeof senha !== 'string' || !email.trim() || !senha) {
+            throw new AppError('Email e senha são obrigatórios', 400)
+        }
+
+        const funcionario = await AuthRepository.findByEmail(email.trim().toLowerCase())
+        // Mesma mensagem para email inexistente e senha errada (não revela quais emails existem)
+        const senhaValida = funcionario && await bcrypt.compare(senha, funcionario.senha)
+        if (!senhaValida) {
+            throw new AppError('Credenciais inválidas', 401)
+        }
+
+        const { accessToken, refreshToken } = await this.emitirTokens(funcionario)
 
         return {
-            funcionario: { id: funcionario.id_funcionario || funcionario.id, nome: funcionario.nome, email: funcionario.email, role: funcionario.id_cargo },
-            acessToken,
-            refreshToken,
+            funcionario: {
+                id: funcionario.id_funcionario,
+                nome: funcionario.nome_completo,
+                email: funcionario.email,
+                idCargo: funcionario.id_cargo,
+                papel: this.papelDoFuncionario(funcionario)
+            },
+            accessToken,
+            refreshToken
         }
     }
 
+    // Rotaciona o refresh token: o antigo é invalidado e um novo é emitido
     async renovarToken(refreshTokenRecebido) {
-        const registro = await AuthRepository.buscarRefreshToken(refreshTokenRecebido)
-        if(!registro) {
-            const error = new Error('Refresh token inválido ou expirado');
-            error.statusCode = 401;
-            throw error;
-        }
+        const invalido = () => new AppError('Refresh token inválido ou expirado', 401)
 
+        let payload
         try {
-            const payload = jwt.verify(refreshTokenRecebido, process.env.JWT_REFRESH_SECRET)
-            const funcionario = await AuthRepository.findById(payload.id)
-            if(!funcionario) {
-                throw new Error('Funcionário não encontrado')
-            }
-
-            const novoAccessToken = this.gerarAcessToken(funcionario)
-            return { acessToken: novoAccessToken }
-        } catch(error) {
-            const err = new Error('Refresh token expirado ou inválido');
-            err.statusCode = 401;
-            throw err;
+            payload = jwtUtils.verificarRefreshToken(refreshTokenRecebido)
+        } catch {
+            throw invalido()
         }
+
+        const registro = await AuthRepository.buscarRefreshToken(refreshTokenRecebido)
+        if (!registro) throw invalido()
+
+        const funcionario = await AuthRepository.findById(payload.id)
+        if (!funcionario) throw invalido()
+
+        await AuthRepository.removerRefreshToken(refreshTokenRecebido)
+        return await this.emitirTokens(funcionario)
     }
 
-    async logout(refreshToken){
+    async logout(refreshToken) {
+        if (!refreshToken) throw new AppError('Refresh token não enviado', 400)
         await AuthRepository.removerRefreshToken(refreshToken)
     }
 }

@@ -11,6 +11,22 @@
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage"
   },
+  "engines": {
+    "node": ">=18"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "setupFiles": [
+      "<rootDir>/jest.setup.js"
+    ],
+    "testMatch": [
+      "**/*.test.js"
+    ],
+    "moduleNameMapper": {
+      "^@scalar/express-api-reference$": "<rootDir>/test-stubs/scalar.js"
+    }
+  },
+  "license": "ISC",
   "dependencies": {
     "@scalar/express-api-reference": "^0.10.26",
     "bcrypt": "^6.0.0",

@@ -157,6 +157,8 @@ describe('FuncionarioService', () => {
 
     it('deve formatar e-mail (trim + minúsculas) e gerar hash da senha antes de salvar', async () => {
       bcrypt.hash.mockResolvedValue('senha-hasheada');
+      FuncionarioRepository.buscarCargoPorId.mockResolvedValue({ id_cargo: 1 });
+      FuncionarioRepository.buscarPorEmail.mockResolvedValue(null);
       FuncionarioRepository.cadastrarFuncionario.mockResolvedValue({ id: 99 });
 
       const resultado = await FuncionarioService.cadastrarFuncionario(dadosValidos());
@@ -172,7 +174,7 @@ describe('FuncionarioService', () => {
         expect.objectContaining({
           nome: 'Maria Silva',
           email: 'maria@email.com',
-          cargo: 1,
+          idCargo: 1,
           senha: 'senha-hasheada',
           ativo: true,
         }),

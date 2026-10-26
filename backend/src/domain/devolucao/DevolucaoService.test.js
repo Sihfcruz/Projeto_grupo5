@@ -1,164 +1,58 @@
-// Adicione no topo do arquivo de teste
-jest.mock('../../config/database', () => ({
-  query: jest.fn(),
-  execute: jest.fn(),
-}));
+jest.mock('./DevolucaoRepository')
+const Repo = require('./DevolucaoRepository')
+const AppError = require('../../shared/errors/AppError')
+const Service = require('./DevolucaoService')
 
-jest.mock('./DevolucaoRepository');
+beforeEach(() => jest.resetAllMocks())
 
-const DevolucaoRepository = require('./DevolucaoRepository');
-const DevolucaoService = require('./DevolucaoService');
-
-const dadosValidos = () => ({
-  idCadastro: 1,
-  codigoProduto: 10,
-  unidades: 2,
-  motivo: 'Produto com defeito',
-  reutilizacao: true,
-  valor: 49.9,
-  dataEntrada: new Date().toISOString(),
-  etiqueta: 'ETQ-001',
-});
+const dados = (extra = {}) => ({
+  idFuncionario: 1, idItemVenda: 4, tipo: 'DEVOLUCAO', quantidade: 1, motivo: 'Tamanho errado',
+  reutilizavel: true, valorReembolso: 100, dataDevolucao: '2026-02-10', ...extra,
+})
 
 describe('DevolucaoService', () => {
-  beforeEach(() => {
-    jest.clearAllMocks();
-  });
+  it('lista vazia retorna 200 com total 0', async () => {
+    Repo.buscarTodasDevolucoes.mockResolvedValue([])
+    await expect(Service.listarDevolucoes()).resolves.toMatchObject({ sucesso: true, total: 0 })
+  })
 
-  describe('listarDevolucoes', () => {
-    it('deve lançar erro 404 quando o repositório não retorna dados', async () => {
-      DevolucaoRepository.buscarTodasDevolucoes.mockResolvedValue(null);
+  it('valida id e 404', async () => {
+    await expect(Service.listarDevolucaoPorId('abc')).rejects.toMatchObject({ statusCode: 400 })
+    Repo.buscarDevolucoesPorId.mockResolvedValue(null)
+    await expect(Service.listarDevolucaoPorId(9)).rejects.toMatchObject({ statusCode: 404 })
+  })
 
-      await expect(DevolucaoService.listarDevolucoes()).rejects.toMatchObject({
-        message: 'Nenhuma devolução encontrada',
-        statusCode: 404,
-      });
-    });
+  it.each([
+    [{ quantidade: 0 }], [{ tipo: 'OUTRO' }], [{ motivo: '' }], [{ reutilizavel: 'sim' }],
+    [{ valorReembolso: -1 }], [{ dataDevolucao: '10/02/2026' }], [{ idItemVenda: 'x' }],
+    [{ tipo: 'TROCA' }], [{ idVendaTroca: 5 }],
+  ])('rejeita payload inválido %j', async (extra) => {
+    await expect(Service.criarDevolucao(dados(extra))).rejects.toMatchObject({ statusCode: 400 })
+  })
 
-    it('deve retornar sucesso e dados quando existem devoluções', async () => {
-      const devolucoesFake = [{ id: 1 }, { id: 2 }];
-      DevolucaoRepository.buscarTodasDevolucoes.mockResolvedValue(devolucoesFake);
+  it('cria devolução e envia colunas em snake_case ao repository', async () => {
+    Repo.cadastrarDevolucao.mockResolvedValue(3)
+    Repo.buscarDevolucoesPorId.mockResolvedValue({ idDevolucao: 3 })
+    const r = await Service.criarDevolucao(dados({ motivo: ' defeito ' }))
+    expect(Repo.cadastrarDevolucao).toHaveBeenCalledWith(expect.objectContaining({
+      id_item_venda: 4, motivo: 'defeito', reutilizavel: true, id_venda_troca: null,
+    }))
+    expect(r.mensagem).toMatch(/Devolução/)
+  })
 
-      const resultado = await DevolucaoService.listarDevolucoes();
+  it('troca exige idVendaTroca', async () => {
+    Repo.cadastrarDevolucao.mockResolvedValue(3)
+    Repo.buscarDevolucoesPorId.mockResolvedValue({})
+    await expect(Service.criarDevolucao(dados({ tipo: 'TROCA', idVendaTroca: 12 }))).resolves.toMatchObject({ sucesso: true })
+  })
 
-      expect(resultado).toEqual({ sucesso: true, dados: devolucoesFake });
-    });
-  });
+  it('propaga AppError do repository (ex.: excede vendido) sem mascarar', async () => {
+    Repo.cadastrarDevolucao.mockRejectedValue(new AppError('Quantidade devolvida excede o vendido', 409))
+    await expect(Service.criarDevolucao(dados())).rejects.toMatchObject({ statusCode: 409 })
+  })
 
-  describe('listarDevolucaoPorId', () => {
-    it.each([undefined, 'abc'])('deve lançar erro quando o id é inválido (%p)', async (id) => {
-      await expect(DevolucaoService.listarDevolucaoPorId(id)).rejects.toMatchObject({
-        message: 'Id deve ser informado',
-        statusCode: 400,
-      });
-    });
-
-    it('deve lançar erro 404 quando a devolução não é encontrada', async () => {
-      DevolucaoRepository.buscarDevolucoesPorId.mockResolvedValue(null);
-
-      await expect(DevolucaoService.listarDevolucaoPorId(1)).rejects.toMatchObject({
-        message: 'Nenhuma devolução encontrada',
-        statusCode: 404,
-      });
-    });
-
-    it('deve retornar a devolução quando encontrada', async () => {
-      const devolucaoFake = { id: 1, motivo: 'Defeito' };
-      DevolucaoRepository.buscarDevolucoesPorId.mockResolvedValue(devolucaoFake);
-
-      const resultado = await DevolucaoService.listarDevolucaoPorId(1);
-
-      expect(resultado).toEqual({ sucesso: true, dados: devolucaoFake });
-    });
-  });
-
-  describe('criarDevolucao', () => {
-    it.each(['codigoProduto', 'unidades', 'motivo', 'valor'])(
-      'deve lançar erro quando o campo obrigatório "%s" não é informado',
-      async (campo) => {
-        const dados = dadosValidos();
-        delete dados[campo];
-
-        await expect(DevolucaoService.criarDevolucao(dados)).rejects.toThrow(
-          `O campo '${campo}' é obrigatório e deve ser preenchido.`,
-        );
-      },
-    );
-
-    it('não deve considerar "reutilizacao: false" como campo obrigatório ausente', async () => {
-      const dados = { ...dadosValidos(), reutilizacao: false };
-      DevolucaoRepository.cadastrarDevolucao.mockResolvedValue({ id: 1, ...dados });
-
-      await expect(DevolucaoService.criarDevolucao(dados)).resolves.toMatchObject({
-        sucesso: true,
-      });
-    });
-
-    it('deve lançar erro quando motivo não é uma string', async () => {
-      const dados = { ...dadosValidos(), motivo: 123 };
-
-      await expect(DevolucaoService.criarDevolucao(dados)).rejects.toThrow(
-        "Os campos 'motivo' e 'etiqueta' devem ser do tipo texto.",
-      );
-    });
-
-    it('deve lançar erro quando etiqueta é informada mas não é uma string', async () => {
-      const dados = { ...dadosValidos(), etiqueta: 123 };
-
-      await expect(DevolucaoService.criarDevolucao(dados)).rejects.toThrow(
-        "Os campos 'motivo' e 'etiqueta' devem ser do tipo texto.",
-      );
-    });
-
-    it('deve lançar erro quando reutilizacao não é booleano', async () => {
-      const dados = { ...dadosValidos(), reutilizacao: 'sim' };
-
-      await expect(DevolucaoService.criarDevolucao(dados)).rejects.toThrow(
-        "O campo 'reutilizacao' deve ser um valor booleano (true ou false).",
-      );
-    });
-
-    it.each(['codigoProduto', 'unidades', 'valor'])(
-      'deve lançar erro quando o campo numérico "%s" é inválido',
-      async (campo) => {
-        const dados = { ...dadosValidos(), [campo]: -1 };
-
-        await expect(DevolucaoService.criarDevolucao(dados)).rejects.toThrow(
-          `O campo '${campo}' deve ser um número válido e maior que zero.`,
-        );
-      },
-    );
-
-    it('deve lançar erro quando idCadastro é informado mas inválido', async () => {
-      const dados = { ...dadosValidos(), idCadastro: -5 };
-
-      await expect(DevolucaoService.criarDevolucao(dados)).rejects.toThrow(
-        "O campo 'idCadastro' deve ser um número válido e maior que zero.",
-      );
-    });
-
-    it('não deve validar idCadastro quando ele não é informado', async () => {
-      const dados = dadosValidos();
-      delete dados.idCadastro;
-      DevolucaoRepository.cadastrarDevolucao.mockResolvedValue({ id: 1, ...dados });
-
-      await expect(DevolucaoService.criarDevolucao(dados)).resolves.toMatchObject({
-        sucesso: true,
-      });
-    });
-
-    it('deve cadastrar a devolução quando todos os dados são válidos', async () => {
-      const dados = dadosValidos();
-      DevolucaoRepository.cadastrarDevolucao.mockResolvedValue({ id: 1, ...dados });
-
-      const resultado = await DevolucaoService.criarDevolucao(dados);
-
-      expect(DevolucaoRepository.cadastrarDevolucao).toHaveBeenCalledWith(dados);
-      expect(resultado).toEqual({
-        sucesso: true,
-        mensagem: 'Devolução cadastrada',
-        dados: { id: 1, ...dados },
-      });
-    });
-  });
-});
+  it('FK inexistente vira 400', async () => {
+    Repo.cadastrarDevolucao.mockRejectedValue({ code: 'ER_NO_REFERENCED_ROW_2' })
+    await expect(Service.criarDevolucao(dados())).rejects.toMatchObject({ statusCode: 400 })
+  })
+})
