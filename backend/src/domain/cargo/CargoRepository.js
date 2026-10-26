@@ -44,6 +44,8 @@ class CargoRepository {
         const query =
             `INSERT INTO cargo VALUES (?, ?)`
 
+        const [rows] = db.query(query, [dados])
+        return rows
 
     }
 
