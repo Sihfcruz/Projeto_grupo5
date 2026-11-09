@@ -1,0 +1,84 @@
+<section id="api" data-transition="fade" style="background:#0E1117;color:#E8ECF4;font-family:'DM Sans',sans-serif;padding:128px;display:flex;flex-direction:column;gap:28px">
+<div>
+  <p style="font-family:'Syne',sans-serif;font-size:13px;letter-spacing:0.14em;color:#4F7CFF;margin-bottom:16px">API</p>
+  <h2 style="font-family:'Syne',sans-serif;font-size:56px;font-weight:800;line-height:1.1;letter-spacing:-0.02em">Contrato REST principal</h2>
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;flex:1">
+  <div style="background:#161C27;border:1px solid #242D3E;border-radius:10px;padding:20px">
+    <p style="font-family:'Syne',sans-serif;font-size:11px;letter-spacing:0.12em;color:#4F7CFF;font-weight:700;margin-bottom:12px">AUTH &amp; USUÁRIOS</p>
+    <div style="display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid #1a2030">
+      <p style="font-family:'Courier New',monospace;font-size:11px;font-weight:700;padding:3px 8px;border-radius:4px;background:#1a2540;color:#4F7CFF;min-width:52px;text-align:center">POST</p>
+      <p style="font-family:'Courier New',monospace;font-size:13px;color:#E8ECF4">/auth/login</p>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid #1a2030">
+      <p style="font-family:'Courier New',monospace;font-size:11px;font-weight:700;padding:3px 8px;border-radius:4px;background:#1a2540;color:#4F7CFF;min-width:52px;text-align:center">POST</p>
+      <p style="font-family:'Courier New',monospace;font-size:13px;color:#E8ECF4">/auth/refresh</p>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid #1a2030">
+      <p style="font-family:'Courier New',monospace;font-size:11px;font-weight:700;padding:3px 8px;border-radius:4px;background:#0d2a24;color:#38D9A9;min-width:52px;text-align:center">GET</p>
+      <p style="font-family:'Courier New',monospace;font-size:13px;color:#E8ECF4">/funcionario</p>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;padding:7px 0">
+      <p style="font-family:'Courier New',monospace;font-size:11px;font-weight:700;padding:3px 8px;border-radius:4px;background:#0d2a24;color:#38D9A9;min-width:52px;text-align:center">GET</p>
+      <p style="font-family:'Courier New',monospace;font-size:13px;color:#E8ECF4">/cargo</p>
+    </div>
+  </div>
+  <div style="background:#161C27;border:1px solid #242D3E;border-radius:10px;padding:20px">
+    <p style="font-family:'Syne',sans-serif;font-size:11px;letter-spacing:0.12em;color:#38D9A9;font-weight:700;margin-bottom:12px">CATÁLOGO</p>
+    <div style="display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid #1a2030">
+      <p style="font-family:'Courier New',monospace;font-size:11px;font-weight:700;padding:3px 8px;border-radius:4px;background:#0d2a24;color:#38D9A9;min-width:52px;text-align:center">GET</p>
+      <p style="font-family:'Courier New',monospace;font-size:13px;color:#E8ECF4">/marca</p>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid #1a2030">
+      <p style="font-family:'Courier New',monospace;font-size:11px;font-weight:700;padding:3px 8px;border-radius:4px;background:#0d2a24;color:#38D9A9;min-width:52px;text-align:center">GET</p>
+      <p style="font-family:'Courier New',monospace;font-size:13px;color:#E8ECF4">/categoria</p>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid #1a2030">
+      <p style="font-family:'Courier New',monospace;font-size:11px;font-weight:700;padding:3px 8px;border-radius:4px;background:#0d2a24;color:#38D9A9;min-width:52px;text-align:center">GET</p>
+      <p style="font-family:'Courier New',monospace;font-size:13px;color:#E8ECF4">/modelo</p>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;padding:7px 0">
+      <p style="font-family:'Courier New',monospace;font-size:11px;font-weight:700;padding:3px 8px;border-radius:4px;background:#0d2a24;color:#38D9A9;min-width:52px;text-align:center">GET</p>
+      <p style="font-family:'Courier New',monospace;font-size:13px;color:#E8ECF4">/sku</p>
+    </div>
+  </div>
+  <div style="background:#161C27;border:1px solid #242D3E;border-radius:10px;padding:20px">
+    <p style="font-family:'Syne',sans-serif;font-size:11px;letter-spacing:0.12em;color:#F4B942;font-weight:700;margin-bottom:12px">OPERAÇÃO</p>
+    <div style="display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid #1a2030">
+      <p style="font-family:'Courier New',monospace;font-size:11px;font-weight:700;padding:3px 8px;border-radius:4px;background:#0d2a24;color:#38D9A9;min-width:52px;text-align:center">GET</p>
+      <p style="font-family:'Courier New',monospace;font-size:13px;color:#E8ECF4">/venda?cursor=&amp;limite=</p>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid #1a2030">
+      <p style="font-family:'Courier New',monospace;font-size:11px;font-weight:700;padding:3px 8px;border-radius:4px;background:#1a2540;color:#4F7CFF;min-width:52px;text-align:center">POST</p>
+      <p style="font-family:'Courier New',monospace;font-size:13px;color:#E8ECF4">/venda</p>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid #1a2030">
+      <p style="font-family:'Courier New',monospace;font-size:11px;font-weight:700;padding:3px 8px;border-radius:4px;background:#2a2210;color:#F4B942;min-width:52px;text-align:center">PATCH</p>
+      <p style="font-family:'Courier New',monospace;font-size:13px;color:#E8ECF4">/venda/:id/status</p>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;padding:7px 0">
+      <p style="font-family:'Courier New',monospace;font-size:11px;font-weight:700;padding:3px 8px;border-radius:4px;background:#1a2540;color:#4F7CFF;min-width:52px;text-align:center">POST</p>
+      <p style="font-family:'Courier New',monospace;font-size:13px;color:#E8ECF4">/devolucao</p>
+    </div>
+  </div>
+  <div style="background:#161C27;border:1px solid #242D3E;border-radius:10px;padding:20px">
+    <p style="font-family:'Syne',sans-serif;font-size:11px;letter-spacing:0.12em;color:#c792ea;font-weight:700;margin-bottom:12px">RELATÓRIOS</p>
+    <div style="display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid #1a2030">
+      <p style="font-family:'Courier New',monospace;font-size:11px;font-weight:700;padding:3px 8px;border-radius:4px;background:#0d2a24;color:#38D9A9;min-width:52px;text-align:center">GET</p>
+      <p style="font-family:'Courier New',monospace;font-size:13px;color:#E8ECF4">/estoque (vw_estoque_atual)</p>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid #1a2030">
+      <p style="font-family:'Courier New',monospace;font-size:11px;font-weight:700;padding:3px 8px;border-radius:4px;background:#0d2a24;color:#38D9A9;min-width:52px;text-align:center">GET</p>
+      <p style="font-family:'Courier New',monospace;font-size:13px;color:#E8ECF4">/cliente</p>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid #1a2030">
+      <p style="font-family:'Courier New',monospace;font-size:11px;font-weight:700;padding:3px 8px;border-radius:4px;background:#0d2a24;color:#38D9A9;min-width:52px;text-align:center">GET</p>
+      <p style="font-family:'Courier New',monospace;font-size:13px;color:#E8ECF4">/fornecedor</p>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;padding:7px 0">
+      <p style="font-family:'Courier New',monospace;font-size:11px;font-weight:700;padding:3px 8px;border-radius:4px;background:#0d2a24;color:#38D9A9;min-width:52px;text-align:center">GET</p>
+      <p style="font-family:'Courier New',monospace;font-size:13px;color:#E8ECF4">/venda/:id</p>
+    </div>
+  </div>
+</div>
+</section>

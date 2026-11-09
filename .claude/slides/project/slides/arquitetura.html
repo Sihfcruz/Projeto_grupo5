@@ -1,0 +1,80 @@
+<section id="arquitetura" data-transition="fade" style="background:#0E1117;color:#E8ECF4;font-family:'DM Sans',sans-serif;padding:128px;display:flex;flex-direction:column;gap:36px">
+<div>
+  <p style="font-family:'Syne',sans-serif;font-size:13px;letter-spacing:0.14em;color:#4F7CFF;margin-bottom:16px">ARQUITETURA</p>
+  <h2 style="font-family:'Syne',sans-serif;font-size:60px;font-weight:800;line-height:1.1;letter-spacing:-0.02em">Visão geral do sistema</h2>
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:0;border:1px solid #242D3E;border-radius:14px;overflow:hidden;flex:1">
+  <div style="padding:24px;border-right:1px solid #242D3E;display:flex;flex-direction:column;gap:10px;background:#161C27">
+    <p style="font-family:'Syne',sans-serif;font-size:11px;letter-spacing:0.12em;color:#4F7CFF;font-weight:700">FRONTEND</p>
+    <div style="background:#0E1117;border:1px solid #242D3E;border-radius:7px;padding:10px 12px">
+      <p style="font-size:13px;color:#E8ECF4">SPA Vanilla JS</p>
+      <p style="font-size:11px;color:#6E7A99;margin-top:3px">ES Modules, sessionStorage</p>
+    </div>
+    <div style="background:#0E1117;border:1px solid #242D3E;border-radius:7px;padding:10px 12px">
+      <p style="font-size:13px;color:#E8ECF4">Pages</p>
+      <p style="font-size:11px;color:#6E7A99;margin-top:3px">dashboard · estoque · vendas · users</p>
+    </div>
+    <div style="background:#0E1117;border:1px solid #242D3E;border-radius:7px;padding:10px 12px">
+      <p style="font-size:13px;color:#E8ECF4">api.js</p>
+      <p style="font-size:11px;color:#6E7A99;margin-top:3px">fetch + renovação automática de token</p>
+    </div>
+    <div style="background:#0E1117;border:1px solid #242D3E;border-radius:7px;padding:10px 12px">
+      <p style="font-size:13px;color:#E8ECF4">config.js</p>
+      <p style="font-size:11px;color:#6E7A99;margin-top:3px">feature flags por página</p>
+    </div>
+  </div>
+  <div style="padding:24px;border-right:1px solid #242D3E;display:flex;flex-direction:column;gap:10px;background:#161C27">
+    <p style="font-family:'Syne',sans-serif;font-size:11px;letter-spacing:0.12em;color:#38D9A9;font-weight:700">BACKEND</p>
+    <div style="background:#0E1117;border:1px solid #242D3E;border-radius:7px;padding:10px 12px">
+      <p style="font-size:13px;color:#E8ECF4">Express 5</p>
+      <p style="font-size:11px;color:#6E7A99;margin-top:3px">server.js → app.js → rotas</p>
+    </div>
+    <div style="background:#0E1117;border:1px solid #242D3E;border-radius:7px;padding:10px 12px">
+      <p style="font-size:13px;color:#E8ECF4">shared/lib/crud.js</p>
+      <p style="font-size:11px;color:#6E7A99;margin-top:3px">criarRepository / Service / Controller</p>
+    </div>
+    <div style="background:#0E1117;border:1px solid #242D3E;border-radius:7px;padding:10px 12px">
+      <p style="font-size:13px;color:#E8ECF4">AppError + winston</p>
+      <p style="font-size:11px;color:#6E7A99;margin-top:3px">tratamento centralizado de erros e logs</p>
+    </div>
+    <div style="background:#0E1117;border:1px solid #242D3E;border-radius:7px;padding:10px 12px">
+      <p style="font-size:13px;color:#E8ECF4">swagger-autogen</p>
+      <p style="font-size:11px;color:#6E7A99;margin-top:3px">documentação automática via Scalar</p>
+    </div>
+  </div>
+  <div style="padding:24px;border-right:1px solid #242D3E;display:flex;flex-direction:column;gap:10px;background:#161C27">
+    <p style="font-family:'Syne',sans-serif;font-size:11px;letter-spacing:0.12em;color:#F4B942;font-weight:700">DOMÍNIOS</p>
+    <div style="background:#0E1117;border:1px solid #242D3E;border-radius:7px;padding:10px 12px">
+      <p style="font-size:13px;color:#E8ECF4">auth · cargo · funcionario</p>
+    </div>
+    <div style="background:#0E1117;border:1px solid #242D3E;border-radius:7px;padding:10px 12px">
+      <p style="font-size:13px;color:#E8ECF4">marca · categoria · modelo · sku</p>
+    </div>
+    <div style="background:#0E1117;border:1px solid #242D3E;border-radius:7px;padding:10px 12px">
+      <p style="font-size:13px;color:#E8ECF4">venda · devolucao · ajuste</p>
+    </div>
+    <div style="background:#0E1117;border:1px solid #242D3E;border-radius:7px;padding:10px 12px">
+      <p style="font-size:13px;color:#E8ECF4">cliente · fornecedor</p>
+    </div>
+  </div>
+  <div style="padding:24px;display:flex;flex-direction:column;gap:10px;background:#161C27">
+    <p style="font-family:'Syne',sans-serif;font-size:11px;letter-spacing:0.12em;color:#c792ea;font-weight:700">DADOS</p>
+    <div style="background:#0E1117;border:1px solid #242D3E;border-radius:7px;padding:10px 12px">
+      <p style="font-size:13px;color:#E8ECF4">MySQL 8</p>
+      <p style="font-size:11px;color:#6E7A99;margin-top:3px">mysql2/promise, pool de conexões</p>
+    </div>
+    <div style="background:#0E1117;border:1px solid #242D3E;border-radius:7px;padding:10px 12px">
+      <p style="font-size:13px;color:#E8ECF4">Soft Delete</p>
+      <p style="font-size:11px;color:#6E7A99;margin-top:3px">deleted_at + ativo em todas as tabelas</p>
+    </div>
+    <div style="background:#0E1117;border:1px solid #242D3E;border-radius:7px;padding:10px 12px">
+      <p style="font-size:13px;color:#E8ECF4">vw_estoque_atual</p>
+      <p style="font-size:11px;color:#6E7A99;margin-top:3px">view consolidada de posição de estoque</p>
+    </div>
+    <div style="background:#0E1117;border:1px solid #242D3E;border-radius:7px;padding:10px 12px">
+      <p style="font-size:13px;color:#E8ECF4">.env + .env.example</p>
+      <p style="font-size:11px;color:#6E7A99;margin-top:3px">secrets fora do repositório</p>
+    </div>
+  </div>
+</div>
+</section>

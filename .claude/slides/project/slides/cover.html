@@ -1,0 +1,53 @@
+<section id="cover" data-transition="fade" style="background:#0E1117;color:#E8ECF4;font-family:'DM Sans',sans-serif;padding:128px;display:flex;flex-direction:column;justify-content:flex-end;gap:0">
+<svg aria-label="Grid background" style="position:absolute;left:0;top:0;width:1920px;height:1080px;opacity:0.18" viewBox="0 0 1920 1080" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <pattern id="grid" width="48" height="48" patternUnits="userSpaceOnUse">
+      <path d="M 48 0 L 0 0 0 48" fill="none" stroke="#4F7CFF" stroke-width="0.5"/>
+    </pattern>
+    <radialGradient id="vignette" cx="50%" cy="50%" r="55%">
+      <stop offset="20%" stop-color="black" stop-opacity="0"/>
+      <stop offset="100%" stop-color="black" stop-opacity="1"/>
+    </radialGradient>
+  </defs>
+  <rect width="1920" height="1080" fill="url(#grid)"/>
+  <rect width="1920" height="1080" fill="url(#vignette)"/>
+</svg>
+<svg aria-label="Accent glow" style="position:absolute;left:800px;top:0;width:1120px;height:700px" viewBox="0 0 1120 700" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="glow1" cx="60%" cy="35%" r="50%">
+      <stop offset="0%" stop-color="#4F7CFF" stop-opacity="0.18"/>
+      <stop offset="100%" stop-color="#4F7CFF" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="glow2" cx="20%" cy="80%" r="40%">
+      <stop offset="0%" stop-color="#38D9A9" stop-opacity="0.12"/>
+      <stop offset="100%" stop-color="#38D9A9" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1120" height="700" fill="url(#glow1)"/>
+  <rect width="1120" height="700" fill="url(#glow2)"/>
+</svg>
+<div style="position:absolute;left:128px;top:140px;display:flex;align-items:center;gap:10px">
+  <div style="width:8px;height:8px;background:#38D9A9;border-radius:50%"></div>
+  <p style="font-family:'Syne',sans-serif;font-size:13px;letter-spacing:0.14em;color:#6E7A99;font-weight:400">APRESENTAÇÃO TÉCNICA · 2026</p>
+</div>
+<h1 style="font-family:'Syne',sans-serif;font-size:88px;font-weight:800;line-height:1.0;letter-spacing:-0.02em;margin-bottom:20px">Sistema <span style="color:#4F7CFF">Nômade</span><br>de Gestão</h1>
+<p style="font-size:20px;color:#6E7A99;max-width:640px;line-height:1.6;margin-bottom:48px">Plataforma full-stack para gestão de estoque, vendas e operação de loja de calçados.</p>
+<div style="display:flex;gap:40px;flex-wrap:wrap">
+  <div>
+    <p style="font-size:12px;letter-spacing:0.06em;color:#6E7A99;margin-bottom:4px">BACKEND</p>
+    <p style="font-size:16px;color:#E8ECF4;font-weight:500">Node.js · Express 5 · MySQL 8</p>
+  </div>
+  <div>
+    <p style="font-size:12px;letter-spacing:0.06em;color:#6E7A99;margin-bottom:4px">FRONTEND</p>
+    <p style="font-size:16px;color:#E8ECF4;font-weight:500">Vanilla JS ES Modules</p>
+  </div>
+  <div>
+    <p style="font-size:12px;letter-spacing:0.06em;color:#6E7A99;margin-bottom:4px">AUTH</p>
+    <p style="font-size:16px;color:#E8ECF4;font-weight:500">JWT dual-token</p>
+  </div>
+  <div>
+    <p style="font-size:12px;letter-spacing:0.06em;color:#6E7A99;margin-bottom:4px">TESTES</p>
+    <p style="font-size:16px;color:#E8ECF4;font-weight:500">Jest · 103 specs</p>
+  </div>
+</div>
+</section>

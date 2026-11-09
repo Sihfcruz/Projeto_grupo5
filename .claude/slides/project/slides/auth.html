@@ -1,0 +1,56 @@
+<section id="auth" data-transition="fade" style="background:#0E1117;color:#E8ECF4;font-family:'DM Sans',sans-serif;padding:128px;display:flex;flex-direction:column;gap:32px">
+<div>
+  <p style="font-family:'Syne',sans-serif;font-size:13px;letter-spacing:0.14em;color:#4F7CFF;margin-bottom:16px">SEGURANÇA</p>
+  <h2 style="font-family:'Syne',sans-serif;font-size:60px;font-weight:800;line-height:1.1;letter-spacing:-0.02em">Fluxo de autenticação JWT</h2>
+</div>
+<div style="display:flex;gap:16px">
+  <div style="flex:1;background:#161C27;border:1px solid #242D3E;border-radius:12px;padding:28px;display:flex;flex-direction:column;gap:10px">
+    <h3 style="font-family:'Syne',sans-serif;font-size:18px;font-weight:700;color:#E8ECF4;margin-bottom:4px">Access Token</h3>
+    <p style="font-size:15px;color:#6E7A99;line-height:1.6">Enviado no header <span style="font-family:'Courier New',monospace;color:#BFC5D6;font-size:14px">Authorization: Bearer</span>. Valida cada request protegido via middleware.</p>
+    <p style="font-size:13px;padding:5px 14px;border-radius:999px;background:#1a2540;color:#4F7CFF;border:1px solid #2a3a60;width:120px;text-align:center">Expira em 15 min</p>
+  </div>
+  <div style="flex:1;background:#161C27;border:1px solid #242D3E;border-radius:12px;padding:28px;display:flex;flex-direction:column;gap:10px">
+    <h3 style="font-family:'Syne',sans-serif;font-size:18px;font-weight:700;color:#E8ECF4;margin-bottom:4px">Refresh Token</h3>
+    <p style="font-size:15px;color:#6E7A99;line-height:1.6">Armazenado no <span style="font-family:'Courier New',monospace;color:#BFC5D6;font-size:14px">sessionStorage</span> do browser. Renovação silenciosa interceptada em api.js.</p>
+    <p style="font-size:13px;padding:5px 14px;border-radius:999px;background:#0d2a24;color:#38D9A9;border:1px solid #1a4a40;width:120px;text-align:center">Expira em 7 dias</p>
+  </div>
+</div>
+<div style="display:flex;flex-direction:column;gap:0;border:1px solid #242D3E;border-radius:12px;overflow:hidden;flex:1">
+  <div style="display:flex;align-items:flex-start;gap:16px;padding:16px 24px;border-bottom:1px solid #242D3E;background:#161C27">
+    <div style="width:28px;height:28px;min-width:28px;border-radius:50%;background:#4F7CFF;display:flex;align-items:center;justify-content:center">
+      <p style="font-size:13px;font-weight:700;color:#fff;font-family:'Syne',sans-serif">1</p>
+    </div>
+    <div>
+      <h3 style="font-family:'Syne',sans-serif;font-size:16px;font-weight:700;color:#E8ECF4;margin-bottom:4px">Login</h3>
+      <p style="font-size:14px;color:#6E7A99">POST /auth/login → bcrypt compara senha, retorna access + refresh tokens.</p>
+    </div>
+  </div>
+  <div style="display:flex;align-items:flex-start;gap:16px;padding:16px 24px;border-bottom:1px solid #242D3E;background:#161C27">
+    <div style="width:28px;height:28px;min-width:28px;border-radius:50%;background:#4F7CFF;display:flex;align-items:center;justify-content:center">
+      <p style="font-size:13px;font-weight:700;color:#fff;font-family:'Syne',sans-serif">2</p>
+    </div>
+    <div>
+      <h3 style="font-family:'Syne',sans-serif;font-size:16px;font-weight:700;color:#E8ECF4;margin-bottom:4px">Request autenticado</h3>
+      <p style="font-size:14px;color:#6E7A99">Middleware verifica JWT_SECRET (≥32 chars). Payload inclui id, nivel, idCargo.</p>
+    </div>
+  </div>
+  <div style="display:flex;align-items:flex-start;gap:16px;padding:16px 24px;border-bottom:1px solid #242D3E;background:#161C27">
+    <div style="width:28px;height:28px;min-width:28px;border-radius:50%;background:#4F7CFF;display:flex;align-items:center;justify-content:center">
+      <p style="font-size:13px;font-weight:700;color:#fff;font-family:'Syne',sans-serif">3</p>
+    </div>
+    <div>
+      <h3 style="font-family:'Syne',sans-serif;font-size:16px;font-weight:700;color:#E8ECF4;margin-bottom:4px">Renovação automática</h3>
+      <p style="font-size:14px;color:#6E7A99">Ao receber 401, api.js chama POST /auth/refresh e reexecuta a request original.</p>
+    </div>
+  </div>
+  <div style="display:flex;align-items:flex-start;gap:16px;padding:16px 24px;background:#161C27">
+    <div style="width:28px;height:28px;min-width:28px;border-radius:50%;background:#242D3E;display:flex;align-items:center;justify-content:center">
+      <p style="font-size:13px;font-weight:700;color:#38D9A9;font-family:'Syne',sans-serif">✓</p>
+    </div>
+    <div>
+      <h3 style="font-family:'Syne',sans-serif;font-size:16px;font-weight:700;color:#E8ECF4;margin-bottom:4px">Startup validation</h3>
+      <p style="font-size:14px;color:#6E7A99">server.js verifica JWT_SECRET ≥32 chars e JWT_REFRESH_SECRET diferente antes de subir.</p>
+    </div>
+  </div>
+</div>
+</section>

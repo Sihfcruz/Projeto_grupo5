@@ -1,0 +1,30 @@
+<section id="crud" data-transition="fade" style="background:#0E1117;color:#E8ECF4;font-family:'DM Sans',sans-serif;padding:128px;display:flex;flex-direction:column;gap:32px">
+<div>
+  <p style="font-family:'Syne',sans-serif;font-size:13px;letter-spacing:0.14em;color:#4F7CFF;margin-bottom:16px">DESIGN PATTERN</p>
+  <h2 style="font-family:'Syne',sans-serif;font-size:60px;font-weight:800;line-height:1.1;letter-spacing:-0.02em">O helper genérico de CRUD</h2>
+</div>
+<div style="background:#161C27;border:1px solid #242D3E;border-radius:12px;padding:32px 36px;flex:1;display:flex;flex-direction:column;justify-content:center">
+  <p style="font-family:'Courier New',monospace;font-size:16px;line-height:1.9;color:#BFC5D6">
+    <span style="color:#6E7A99;font-style:italic">// shared/lib/crud.js — cada domínio simples usa assim:</span><br>
+    <span style="color:#c792ea">const</span> config = { tabela: <span style="color:#38D9A9">'marca'</span>, pk: <span style="color:#38D9A9">'id_marca'</span>, softDelete: <span style="color:#c792ea">true</span>,<br>
+    <span style="color:#BFC5D6">  colunas: { </span><span style="background:#1a2540;border-radius:3px;padding:1px 4px;color:#82aaff">idMarca</span><span style="color:#BFC5D6">: </span><span style="color:#38D9A9">'id_marca'</span><span style="color:#BFC5D6">, </span><span style="background:#1a2540;border-radius:3px;padding:1px 4px;color:#82aaff">nome</span><span style="color:#BFC5D6">: </span><span style="color:#38D9A9">'nome'</span><span style="color:#BFC5D6"> },</span><br>
+    <span style="color:#BFC5D6">  gravaveis: [</span><span style="color:#38D9A9">'nome'</span><span style="color:#BFC5D6">],</span><br>
+    <span style="color:#BFC5D6">  schema: { nome: { obrigatorio: </span><span style="color:#c792ea">true</span><span style="color:#BFC5D6">, valida: v.texto(</span><span style="color:#38D9A9">'nome'</span><span style="color:#BFC5D6">, { max: 100 }) } }</span><br>
+    <span style="color:#BFC5D6">}</span><br>
+    <br>
+    <span style="color:#c792ea">module.exports</span> = <span style="color:#82aaff">criarRotas</span><span style="color:#BFC5D6">({</span><br>
+    <span style="color:#BFC5D6">  controller: </span><span style="color:#82aaff">criarController</span><span style="color:#BFC5D6">({</span><br>
+    <span style="color:#BFC5D6">    service: </span><span style="color:#82aaff">criarService</span><span style="color:#BFC5D6">({ repository: </span><span style="color:#82aaff">criarRepository</span><span style="color:#BFC5D6">(config), ...config }),</span><br>
+    <span style="color:#BFC5D6">    ...config</span><br>
+    <span style="color:#BFC5D6">  })</span><br>
+    <span style="color:#BFC5D6">})</span>
+  </p>
+</div>
+<div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">
+  <p style="font-family:'Courier New',monospace;font-size:14px;padding:7px 16px;border-radius:999px;border:1px solid #242D3E;background:#161C27;color:#6E7A99">criarRepository</p>
+  <p style="font-family:'Courier New',monospace;font-size:14px;padding:7px 16px;border-radius:999px;border:1px solid #242D3E;background:#161C27;color:#6E7A99">criarService</p>
+  <p style="font-family:'Courier New',monospace;font-size:14px;padding:7px 16px;border-radius:999px;border:1px solid #242D3E;background:#161C27;color:#6E7A99">criarController</p>
+  <p style="font-family:'Courier New',monospace;font-size:14px;padding:7px 16px;border-radius:999px;border:1px solid #242D3E;background:#161C27;color:#6E7A99">criarRotas</p>
+  <p style="font-size:14px;color:#6E7A99">→ GET / POST / PATCH / DELETE gerados automaticamente</p>
+</div>
+</section>

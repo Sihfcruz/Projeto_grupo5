@@ -1,0 +1,35 @@
+<section id="vendas" data-transition="fade" style="background:#0E1117;color:#E8ECF4;font-family:'DM Sans',sans-serif;padding:128px;display:flex;flex-direction:column;gap:28px">
+<div>
+  <p style="font-family:'Syne',sans-serif;font-size:13px;letter-spacing:0.14em;color:#4F7CFF;margin-bottom:16px">DOMÍNIO PRINCIPAL</p>
+  <h2 style="font-family:'Syne',sans-serif;font-size:56px;font-weight:800;line-height:1.1;letter-spacing:-0.02em">Ciclo de vida de uma venda</h2>
+</div>
+<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+  <p style="font-family:'Courier New',monospace;font-size:14px;font-weight:500;padding:8px 18px;border-radius:999px;background:#1a2540;color:#4F7CFF;border:1px solid #2a3a60">ABERTA</p>
+  <p style="font-size:18px;color:#6E7A99">→</p>
+  <p style="font-family:'Courier New',monospace;font-size:14px;font-weight:500;padding:8px 18px;border-radius:999px;background:#0d2a24;color:#38D9A9;border:1px solid #1a4a40">PAGA</p>
+  <p style="font-size:18px;color:#6E7A99">→</p>
+  <p style="font-family:'Courier New',monospace;font-size:14px;font-weight:500;padding:8px 18px;border-radius:999px;background:#2a2210;color:#F4B942;border:1px solid #4a3a20">ENVIADA</p>
+  <p style="font-size:18px;color:#6E7A99">→</p>
+  <p style="font-family:'Courier New',monospace;font-size:14px;font-weight:500;padding:8px 18px;border-radius:999px;background:#0d2a24;color:#38D9A9;border:1px solid #1a4a40">ENTREGUE</p>
+  <p style="font-size:18px;color:#E05C5C">↗</p>
+  <p style="font-family:'Courier New',monospace;font-size:14px;font-weight:500;padding:8px 18px;border-radius:999px;background:#2a1010;color:#E05C5C;border:1px solid #4a2020">CANCELADA</p>
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;flex:1">
+  <div style="background:#161C27;border:1px solid #242D3E;border-radius:10px;padding:24px">
+    <h3 style="font-family:'Syne',sans-serif;font-size:16px;font-weight:700;color:#4F7CFF;margin-bottom:10px">Cálculo de preços</h3>
+    <p style="font-size:14px;color:#6E7A99;line-height:1.6">Tudo em centavos internamente (Math.round(valor × 100)) para evitar erros de ponto flutuante. Preço sempre vem do cadastro do SKU, nunca do cliente.</p>
+  </div>
+  <div style="background:#161C27;border:1px solid #242D3E;border-radius:10px;padding:24px">
+    <h3 style="font-family:'Syne',sans-serif;font-size:16px;font-weight:700;color:#38D9A9;margin-bottom:10px">Atomicidade</h3>
+    <p style="font-size:14px;color:#6E7A99;line-height:1.6">Criação de venda roda em transação: SELECT FOR UPDATE nos SKUs, verifica estoque, insere itens, baixa quantidade, insere pagamentos — tudo ou nada.</p>
+  </div>
+  <div style="background:#161C27;border:1px solid #242D3E;border-radius:10px;padding:24px">
+    <h3 style="font-family:'Syne',sans-serif;font-size:16px;font-weight:700;color:#F4B942;margin-bottom:10px">Paginação por cursor</h3>
+    <p style="font-size:14px;color:#6E7A99;line-height:1.6">GET /venda usa cursor opaco (base64url de {idVenda, dataVenda}) em vez de offset, para consistência em grandes volumes.</p>
+  </div>
+  <div style="background:#161C27;border:1px solid #242D3E;border-radius:10px;padding:24px">
+    <h3 style="font-family:'Syne',sans-serif;font-size:16px;font-weight:700;color:#E05C5C;margin-bottom:10px">Cancelamento seguro</h3>
+    <p style="font-size:14px;color:#6E7A99;line-height:1.6">Bloqueia cancelamento se houver devoluções registradas. Repõe estoque automaticamente ao cancelar.</p>
+  </div>
+</div>
+</section>

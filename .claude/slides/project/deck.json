@@ -1,0 +1,16 @@
+{
+  "v": 4,
+  "createdOnFiles": {"v": 1, "at": "2026-11-09T12:00:00Z"},
+  "title": "Nômade – Sistema de Gestão",
+  "order": ["cover","contexto","solucao","arquitetura","crud","auth","vendas","testes","api","resumo"],
+  "sections": {
+    "s1": {"description": "Visão geral do produto e stack tecnológico", "start": "cover"},
+    "s2": {"description": "Arquitetura e padrões de desenvolvimento", "start": "arquitetura"},
+    "s3": {"description": "Domínios principais e qualidade", "start": "vendas"}
+  },
+  "faces": {
+    "syne": {"family": "Syne", "href": "https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&display=swap"},
+    "dm-sans": {"family": "DM Sans", "href": "https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&display=swap"}
+  },
+  "designSystems": []
+}
