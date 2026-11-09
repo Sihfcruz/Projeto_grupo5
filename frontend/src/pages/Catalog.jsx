@@ -13,9 +13,11 @@ import {
 export default function Catalog() {
   const brands = useResource("/marca");
   const models = useResource("/modelo");
+  const categories = useResource("/categoria");
   const refresh = () => {
     brands.reload();
     models.reload();
+    categories.reload();
   };
   return (
     <>
@@ -52,15 +54,15 @@ export default function Catalog() {
             error={models.error}
           >
             {models.data.map((r) => (
-              <tr key={r.id_modelo}>
+              <tr key={r.idModelo}>
                 <td>
-                  <strong>{r.nome_modelo}</strong>
-                  <small>#{r.id_modelo}</small>
+                  <strong>{r.nome}</strong>
+                  <small>#{r.idModelo}</small>
                 </td>
                 <td>
                   {brands.data.find(
-                    (b) => Number(b.id_marca) === Number(r.id_marca),
-                  )?.nome_marca || `Marca #${r.id_marca}`}
+                    (b) => Number(b.idMarca) === Number(r.idMarca),
+                  )?.nome || `Marca #${r.idMarca}`}
                 </td>
                 <td>{r.genero || "—"}</td>
                 <td>
@@ -80,9 +82,9 @@ export default function Catalog() {
             error={brands.error}
           >
             {brands.data.map((r) => (
-              <tr key={r.id_marca}>
-                <td>#{r.id_marca}</td>
-                <td>{r.nome_marca}</td>
+              <tr key={r.idMarca}>
+                <td>#{r.idMarca}</td>
+                <td>{r.nome}</td>
               </tr>
             ))}
           </Table>
@@ -90,6 +92,7 @@ export default function Catalog() {
       </div>
       <div className="grid-two">
         <Panel title="Novo modelo">
+          <ErrorMessage message={categories.error} />
           <ActionForm
             feature="createModel"
             label="Cadastrar modelo"
@@ -98,7 +101,7 @@ export default function Catalog() {
               if (!nome) throw new Error("Informe o nome do modelo.");
               await request("/modelo", {
                 method: "POST",
-                body: { nome, idMarca: Number(values.idMarca) },
+                body: { nome, idMarca: Number(values.idMarca), idCategoria: Number(values.idCategoria) },
               });
               refresh();
               return "Modelo cadastrado.";
@@ -114,9 +117,15 @@ export default function Catalog() {
               <SelectField label="Marca" name="idMarca" required>
                 <option value="">Selecione</option>
                 {brands.data.map((r) => (
-                  <option key={r.id_marca} value={r.id_marca}>
-                    {r.nome_marca}
+                  <option key={r.idMarca} value={r.idMarca}>
+                    {r.nome}
                   </option>
+                ))}
+              </SelectField>
+              <SelectField label="Categoria" name="idCategoria" required>
+                <option value="">Selecione</option>
+                {categories.data.map((r) => (
+                  <option key={r.idCategoria} value={r.idCategoria}>{r.nome}</option>
                 ))}
               </SelectField>
             </div>

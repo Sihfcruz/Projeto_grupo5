@@ -98,7 +98,7 @@ class VendaRepository {
     }
 
     // Executa o callback dentro de uma transação. Qualquer erro faz rollback.
-    // READ COMMITTED garante que a checagem de estoque (trigger) enxergue
+    // READ COMMITTED garante que a checagem de estoque enxergue
     // vendas já confirmadas por outras transações.
     async executarEmTransacao(callback) {
         const connection = await pool.getConnection()
@@ -208,7 +208,7 @@ class VendaRepository {
 
     async atualizarStatus(connection, idVenda, status) {
         await connection.query('UPDATE venda SET status = ? WHERE id_venda = ?', [status, idVenda])
-        // pagamentos pendentes viram estornados no cancelamento
+        // Pagamentos aprovados viram estornados no cancelamento
         if (status === 'CANCELADA') {
             await connection.query(
                 "UPDATE pagamento SET status = 'ESTORNADO' WHERE id_venda = ? AND status = 'APROVADO'", [idVenda]

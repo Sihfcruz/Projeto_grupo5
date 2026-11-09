@@ -35,30 +35,30 @@ const stock = [
 export const demo = {
   "/estoque": stock,
   "/marca": [
-    { id_marca: 1, nome_marca: "Nike" },
-    { id_marca: 2, nome_marca: "Adidas" },
-    { id_marca: 3, nome_marca: "Vans" },
-    { id_marca: 4, nome_marca: "Converse" },
+    { idMarca: 1, nome: "Nike" },
+    { idMarca: 2, nome: "Adidas" },
+    { idMarca: 3, nome: "Vans" },
+    { idMarca: 4, nome: "Converse" },
   ],
   "/modelo": [
     {
-      id_modelo: 1,
-      nome_modelo: "Air Max 90",
-      id_marca: 1,
+      idModelo: 1,
+      nome: "Air Max 90",
+      idMarca: 1,
       genero: "UNISSEX",
       ativo: 1,
     },
     {
-      id_modelo: 2,
-      nome_modelo: "Runner",
-      id_marca: 2,
+      idModelo: 2,
+      nome: "Runner",
+      idMarca: 2,
       genero: "UNISSEX",
       ativo: 1,
     },
   ],
   "/cargo": [
-    { id_cargo: 1, nome_cargo: "Administrador", nivel_acesso: 2 },
-    { id_cargo: 2, nome_cargo: "Vendedor", nivel_acesso: 1 },
+    { idCargo: 1, nome: "Administrador", nivelAcesso: 100 },
+    { idCargo: 2, nome: "Vendedor", nivelAcesso: 10 },
   ],
   "/funcionario": [
     {

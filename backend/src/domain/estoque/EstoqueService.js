@@ -33,7 +33,7 @@ class EstoqueService {
         const idSku = Number(id);
 
         // Fail-Fast: Validação estrita de tipo na entrada do Service
-        if (!id || Number.isNaN(idSku) || idSku <= 0) {
+        if (!Number.isInteger(idSku) || idSku <= 0) {
             throw new AppError("O identificador (ID) do SKU informado é inválido.", 400);
         }
 

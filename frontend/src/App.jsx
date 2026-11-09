@@ -34,7 +34,7 @@ export class ErrorBoundary extends Component {
 }
 export default function App({ page = document.body.dataset.page }) {
   const session = getSession();
-  const valid = !!session && (session.mode === "demo" || !!session.acessToken);
+  const valid = !!session && (session.mode === "demo" || !!session.accessToken);
   useEffect(() => {
     if (page !== "login") requireSession();
   }, [page]);
@@ -46,11 +46,12 @@ export default function App({ page = document.body.dataset.page }) {
     );
   if (!valid) return null;
   const Page = pages[page];
+  const restricted = page === "users" && session.mode !== "demo" && session.funcionario?.papel !== "admin";
   return (
     <ToastProvider>
       <Shell page={page}>
         <ErrorBoundary>
-          {Page ? <Page /> : <p className="error">Página não encontrada.</p>}
+          {restricted ? <p className="notice">Acesso restrito a administrador.</p> : Page ? <Page /> : <p className="error">Página não encontrada.</p>}
         </ErrorBoundary>
       </Shell>
     </ToastProvider>

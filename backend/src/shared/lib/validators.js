@@ -68,7 +68,15 @@ const apenasDigitos = (campo, tamanhos) => (valor) => {
     return digitos
 }
 
+const dataISO = (campo) => (valor) => {
+    if (typeof valor !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(valor) ||
+        Number.isNaN(Date.parse(valor)) || new Date(valor).toISOString().slice(0, 10) !== valor) {
+        throw new AppError(`O campo '${campo}' deve ser uma data válida no formato AAAA-MM-DD.`)
+    }
+    return valor
+}
+
 module.exports = {
-    texto, textoOpcional, inteiroPositivo, inteiroPositivoOpcional, inteiroMin,
+    dataISO, texto, textoOpcional, inteiroPositivo, inteiroPositivoOpcional, inteiroMin,
     decimalPositivo, enumerado, emailValido, apenasDigitos
 }

@@ -2,6 +2,25 @@ const FuncionarioRepository = require('./FuncionariosRepository');
 const bcrypt = require("bcrypt");
 const AppError = require("../../shared/errors/AppError");
 
+const { dataISO, texto } = require('../../shared/lib/validators');
+const { traduzirErroBanco } = require('../../shared/lib/crud');
+
+function validarNascimento(valor) {
+  try { dataISO('dataNascimento')(valor); } catch { throw new AppError('Data de nascimento inválida', 400); }
+  const hoje = new Date();
+  const limite = new Date(hoje.getFullYear() - 14, hoje.getMonth(), hoje.getDate());
+  const nascimento = new Date(valor + 'T00:00:00');
+  if (nascimento > limite) throw new AppError('O funcionario deve ter no mínimo 14 anos de idade', 422);
+  return valor;
+}
+
+function validarSenha(senha) {
+  if (typeof senha !== 'string' || senha.length < 8 || Buffer.byteLength(senha, 'utf8') > 72) {
+    throw new AppError('A senha deve ter no mínimo 8 caracteres e no máximo 72 bytes', 400);
+  }
+  return senha;
+}
+
 class FuncionarioService {
   #EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   #SALT_ROUNDS = 10;
@@ -22,7 +41,7 @@ class FuncionarioService {
 
   async buscarFuncionarioPorId(id) {
     const idNumerico = Number(id);
-    if (!id || isNaN(idNumerico) || idNumerico <= 0) {
+    if (!Number.isInteger(idNumerico) || idNumerico <= 0) {
       throw new AppError("ID inválido", 400);
     }
 
@@ -42,13 +61,13 @@ class FuncionarioService {
   }
 
   async cadastrarFuncionario(dados) {
-    const { nome, dataNascimento, senha, email, idCargo } = dados;
+    const { nome, dataNascimento, senha, email, idCargo } = dados || {};
 
     if (
-      !nome?.trim() ||
+      (typeof nome !== "string" || !nome.trim()) ||
       !dataNascimento ||
-      !senha?.trim() ||
-      !email?.trim() ||
+      (typeof senha !== "string" || !senha) ||
+      (typeof email !== "string" || !email.trim()) ||
       !idCargo
     ) {
       throw new AppError(
@@ -63,23 +82,10 @@ class FuncionarioService {
       throw new AppError("Formato de e-mail inválido", 400);
     }
 
-    const dataNasc = new Date(dataNascimento);
-    if (isNaN(dataNasc.getTime())) {
-      throw new AppError("Data de nascimento inválida", 400);
-    }
-
-    const idadeDiff = new Date(Date.now() - dataNasc.getTime());
-    const idade = Math.abs(idadeDiff.getUTCFullYear() - 1970);
-    if (idade < 14) {
-      throw new AppError(
-        "O funcionario deve ter no mínimo 14 anos de idade",
-        422,
-      );
-    }
-
-    if (senha.trim().length < 8) {
-      throw new AppError("A senha deve ter no mínimo 8 caracteres", 400);
-    }
+    validarNascimento(dataNascimento);
+    validarSenha(senha);
+    texto("nome", { max: 100 })(nome);
+    texto("email", { max: 150 })(email);
 
     if (!Number.isInteger(Number(idCargo)) || Number(idCargo) <= 0) {
       throw new AppError("ID de cargo inválido", 400);
@@ -91,7 +97,7 @@ class FuncionarioService {
     const emailEmUso = await FuncionarioRepository.buscarPorEmail(emailFormatado);
     if (emailEmUso) throw new AppError("E-mail já está em uso", 409);
 
-    const senhaHash = await bcrypt.hash(senha.trim(), this.#SALT_ROUNDS);
+    const senhaHash = await bcrypt.hash(senha, this.#SALT_ROUNDS);
 
     const novoFuncionario = {
       nome: nome.trim(),
@@ -102,8 +108,9 @@ class FuncionarioService {
       ativo: true,
     };
 
-    const resultado =
-      await FuncionarioRepository.cadastrarFuncionario(novoFuncionario);
+    let resultado;
+    try { resultado = await FuncionarioRepository.cadastrarFuncionario(novoFuncionario); }
+    catch (error) { throw traduzirErroBanco(error, "Funcionário"); }
 
     return {
       sucesso: true,
@@ -114,7 +121,7 @@ class FuncionarioService {
 
   async atualizarFuncionario(id, dados) {
     const idNumerico = Number(id);
-    if (!id || isNaN(idNumerico) || idNumerico <= 0) {
+    if (!Number.isInteger(idNumerico) || idNumerico <= 0) {
       throw new AppError("Id inválido", 400);
     }
 
@@ -126,12 +133,12 @@ class FuncionarioService {
     }
 
     const payloadAtualizacao = {};
-    const { nome, dataNascimento, senha, email, idCargo } = dados;
+    const { nome, dataNascimento, senha, email, idCargo } = dados || {};
 
-    if (nome !== undefined && nome.trim() !== "")
-      payloadAtualizacao.nome = nome.trim();
+    if (nome !== undefined) payloadAtualizacao.nome = texto("nome", { max: 100 })(nome);
+    if (dataNascimento !== undefined) payloadAtualizacao.dataNascimento = validarNascimento(dataNascimento);
     if (email !== undefined) {
-      const emailFormatted = email.trim().toLowerCase();
+      const emailFormatted = texto("email", { max: 150 })(email).toLowerCase();
       if (!this.#EMAIL_REGEX.test(emailFormatted)) {
         throw new AppError("Formato de e-mail inválido", 400);
       }
@@ -143,16 +150,17 @@ class FuncionarioService {
       }
       payloadAtualizacao.email = emailFormatted;
     }
-    if (senha !== undefined && senha.trim() !== "") {
+    if (senha !== undefined) {
+      validarSenha(senha);
       payloadAtualizacao.senha = await bcrypt.hash(
-        senha.trim(),
+        senha,
         this.#SALT_ROUNDS,
       );
     }
 
     if (idCargo !== undefined) {
       const idCargoNum = Number(idCargo);
-      if (isNaN(idCargoNum))
+      if (!Number.isInteger(idCargoNum) || idCargoNum <= 0)
         throw new AppError("ID de cargo deve ser um número", 400);
 
       const cargoExistente =
@@ -167,10 +175,8 @@ class FuncionarioService {
       throw new AppError("Nenhum dado válido enviado para atualização", 400);
     }
 
-    await FuncionarioRepository.atualizarFuncionario(
-      idNumerico,
-      payloadAtualizacao,
-    );
+    try { await FuncionarioRepository.atualizarFuncionario(idNumerico, payloadAtualizacao); }
+    catch (error) { throw traduzirErroBanco(error, "Funcionário"); }
 
     return {
       sucesso: true,
@@ -180,7 +186,7 @@ class FuncionarioService {
 
   async deletarFuncionario(id) {
     const idNumerico = Number(id);
-    if (!id || isNaN(idNumerico) || idNumerico <= 0) {
+    if (!Number.isInteger(idNumerico) || idNumerico <= 0) {
       throw new AppError("ID inválido", 400);
     }
 
@@ -202,7 +208,7 @@ class FuncionarioService {
 
   async deletarFuncionarioPermanentemente(id) {
     const idNumerico = Number(id);
-    if (!id || isNaN(idNumerico) || idNumerico <= 0) {
+    if (!Number.isInteger(idNumerico) || idNumerico <= 0) {
       throw new AppError("ID inválido", 400);
     }
 

@@ -1,17 +1,16 @@
-require('dotenv').config()
+const config = require('./config/environment')
 const app = require('./app')
 const pool = require('./config/database')
 
-const PORT = process.env.PORT || 3000
+const PORT = config.port
 
 console.log('Inicializando servidor!')
 
 function verifyToken() {
-    const primaryKey = process.env.JWT_SECRET
-    const secondKey = process.env.JWT_SECRET_SECUNDARY
-
-    if (primaryKey && primaryKey.length >= 32) return primaryKey
-    if (secondKey && secondKey.length >= 32) return secondKey
+    if (!config.jwt.refreshSecret || config.jwt.refreshSecret.length < 32 || config.jwt.refreshSecret === config.jwt.secret) {
+        throw new Error('Configure JWT_REFRESH_SECRET com pelo menos 32 caracteres e diferente da chave de acesso')
+    }
+    if (config.jwt.secret && config.jwt.secret.length >= 32) return config.jwt.secret
 
     throw new Error("Falha crítica: Nenhuma chave JWT válida (com +32 caractéres), foi encontrada no env")
 }

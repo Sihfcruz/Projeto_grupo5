@@ -52,7 +52,7 @@ class DevolucaoRepository {
             await connection.beginTransaction();
 
             const [itens] = await connection.query(
-                `SELECT iv.id_item_venda, iv.id_sku, iv.quantidade, iv.preco_unitario, v.status
+                `SELECT iv.id_item_venda, iv.id_sku, iv.quantidade, iv.preco_unitario, iv.desconto_item, iv.id_venda, v.status, v.desconto, v.valor_total
                    FROM item_venda iv
                    JOIN venda v ON v.id_venda = iv.id_venda
                   WHERE iv.id_item_venda = ?
@@ -77,7 +77,15 @@ class DevolucaoRepository {
                 );
             }
 
-            const maxReembolso = Math.round(item.preco_unitario * devolucaoData.quantidade * 100) / 100;
+            const brutoCent = Math.round(Number(item.preco_unitario) * 100) * item.quantidade;
+            const liquidoCent = brutoCent - Math.round(Number(item.desconto_item) * 100);
+            const totalCent = Math.round(Number(item.valor_total) * 100);
+            const subtotalCent = totalCent + Math.round(Number(item.desconto) * 100);
+            const proporcao = subtotalCent > 0 ? totalCent / subtotalCent : 0;
+            const maxReembolso = Math.floor(liquidoCent * proporcao * devolucaoData.quantidade / item.quantidade) / 100;
+            if (devolucaoData.id_venda_troca === item.id_venda) {
+                throw new AppError('A venda de troca deve ser diferente da venda de origem.', 400);
+            }
             if (devolucaoData.valor_reembolso > maxReembolso) {
                 throw new AppError(`O reembolso não pode passar de ${maxReembolso.toFixed(2)}.`, 400);
             }

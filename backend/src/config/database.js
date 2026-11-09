@@ -16,15 +16,4 @@ const pool = mysql.createPool({
     keepAliveInitialDelay: 0,
 })
 
-//teste conexão
-pool.getConnection()
-    .then((connection) => {
-        logger.info('Conexão com o banco de dados estabelecida')
-        connection.release()
-    })
-    .catch((error) => {
-        logger.error('Erro ao conectar com o banco de dados:', error.message)
-        process.exit(1)
-    })
-
 module.exports = pool

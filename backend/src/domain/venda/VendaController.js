@@ -3,7 +3,7 @@ const VendaService = require('./VendaService');
 class VendaController {
     async listarVendasPaginadas(req, res, next) {
         try {
-            const limite = parseInt(req.query.limite, 10) || 20;
+            const limite = req.query.limite === undefined ? 20 : Number(req.query.limite);
             const cursor = req.query.cursor || null;
             return res.status(200).json(await VendaService.listarVendasPaginadas({ limite, cursor }));
         } catch (error) {

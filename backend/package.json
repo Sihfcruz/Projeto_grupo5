@@ -9,22 +9,12 @@
     "docs:generate": "node src/swagger.js",
     "test": "jest --runInBand",
     "test:watch": "jest --watch",
-    "test:coverage": "jest --coverage"
+    "test:coverage": "jest --coverage",
+    "seed:admin": "node src/config/seedAdmin.js",
+    "dev": "node --watch src/server.js"
   },
   "engines": {
     "node": ">=18"
-  },
-  "jest": {
-    "testEnvironment": "node",
-    "setupFiles": [
-      "<rootDir>/jest.setup.js"
-    ],
-    "testMatch": [
-      "**/*.test.js"
-    ],
-    "moduleNameMapper": {
-      "^@scalar/express-api-reference$": "<rootDir>/test-stubs/scalar.js"
-    }
   },
   "license": "ISC",
   "dependencies": {
@@ -42,12 +32,8 @@
     "winston": "^3.19.0"
   },
   "devDependencies": {
-    "@types/jest": "^30.0.0",
-    "@types/node": "^26.5.1",
     "jest": "^30.5.1",
     "supertest": "^7.3.1",
-    "swagger-autogen": "^2.23.7",
-    "ts-jest": "^29.4.12",
-    "typescript": "^7.0.2"
+    "swagger-autogen": "^2.23.7"
   }
 }

@@ -17,7 +17,7 @@ class FuncionarioRepository {
     }
 
     async buscarPorEmail(email) {
-        const [rows] = await pool.query('SELECT * FROM funcionario WHERE email = ? AND deleted_at IS NULL', [email])
+        const [rows] = await pool.query('SELECT * FROM funcionario WHERE email = ?', [email])
         if (rows.length === 0) return null
         return rows[0]
     }

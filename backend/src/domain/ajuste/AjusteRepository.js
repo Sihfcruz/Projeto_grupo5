@@ -8,7 +8,7 @@ class AjusteRepository {
             await connection.beginTransaction();
 
             const [skus] = await connection.query(
-                'SELECT quantidade_estoque FROM sku WHERE id_sku = ? AND deleted_at IS NULL FOR UPDATE', [idSku]
+                'SELECT quantidade_estoque FROM sku WHERE id_sku = ? AND ativo = TRUE AND deleted_at IS NULL FOR UPDATE', [idSku]
             );
             if (skus.length === 0) throw new AppError('SKU não encontrado.', 404);
             if (skus[0].quantidade_estoque + quantidade < 0) {

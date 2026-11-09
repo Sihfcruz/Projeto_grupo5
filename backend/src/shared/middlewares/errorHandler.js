@@ -7,7 +7,7 @@ function errorHandler(err, req, res, next) { // eslint-disable-line no-unused-va
         return res.status(400).json({ sucesso: false, erro: 'JSON inválido no corpo da requisição' })
     }
 
-    const statusCode = err.statusCode || 500
+    const statusCode = err.statusCode || err.status || 500
 
     if (statusCode >= 500) {
         logger.error({

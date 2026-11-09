@@ -87,8 +87,8 @@ export default function Users() {
                 <td>{r.email}</td>
                 <td>
                   {roles.data.find(
-                    (c) => Number(c.id_cargo) === Number(r.id_cargo),
-                  )?.nome_cargo || `Cargo #${r.id_cargo}`}
+                    (c) => Number(c.idCargo) === Number(r.id_cargo),
+                  )?.nome || `Cargo #${r.id_cargo}`}
                 </td>
                 <td>
                   <div className="row-actions">
@@ -167,8 +167,8 @@ export default function Users() {
               <SelectField label="Cargo" name="idCargo" required>
                 <option value="">Selecione</option>
                 {roles.data.map((r) => (
-                  <option key={r.id_cargo} value={r.id_cargo}>
-                    {r.nome_cargo}
+                  <option key={r.idCargo} value={r.idCargo}>
+                    {r.nome}
                   </option>
                 ))}
               </SelectField>
@@ -203,10 +203,10 @@ export default function Users() {
             error={roles.error}
           >
             {roles.data.map((r) => (
-              <tr key={r.id_cargo}>
-                <td>#{r.id_cargo}</td>
-                <td>{r.nome_cargo}</td>
-                <td>{r.nivel_acesso}</td>
+              <tr key={r.idCargo}>
+                <td>#{r.idCargo}</td>
+                <td>{r.nome}</td>
+                <td>{r.nivelAcesso}</td>
                 <td>
                   <div className="row-actions">
                     <button
@@ -239,8 +239,8 @@ export default function Users() {
               await request("/cargo", {
                 method: "POST",
                 body: {
-                  nome_cargo: nome,
-                  nivel_acesso: Number(values.nivel_acesso),
+                  nome,
+                  nivelAcesso: Number(values.nivel_acesso),
                 },
               });
               refresh();
@@ -291,7 +291,7 @@ function UserAction({ action, onClose, onSaved }) {
     : employee
       ? "editEmployee"
       : "editRole";
-  const id = employee ? row.id_funcionario : row.id_cargo;
+  const id = employee ? row.id_funcionario : row.idCargo;
   const title = removing
     ? employee
       ? "Desativar funcionário"
@@ -322,8 +322,8 @@ function UserAction({ action, onClose, onSaved }) {
               if (values.senha) body.senha = values.senha;
             } else
               body = {
-                nome_cargo: values.nome_cargo.trim(),
-                nivel_acesso: Number(values.nivel_acesso),
+                nome: values.nome_cargo.trim(),
+                nivelAcesso: Number(values.nivel_acesso),
               };
           }
           await request(`/${employee ? "funcionario" : "cargo"}/${id}`, {
@@ -345,7 +345,7 @@ function UserAction({ action, onClose, onSaved }) {
           <>
             <p>
               {employee ? "Desativar" : "Excluir"}{" "}
-              <strong>{employee ? row.nome_completo : row.nome_cargo}</strong>?
+              <strong>{employee ? row.nome_completo : row.nome}</strong>?
             </p>
             <p className="muted">
               {employee
@@ -391,7 +391,7 @@ function UserAction({ action, onClose, onSaved }) {
               name="nome_cargo"
               required
               maxLength={100}
-              defaultValue={row.nome_cargo}
+              defaultValue={row.nome}
             />
             <Field
               label="Nível de acesso"
@@ -400,7 +400,7 @@ function UserAction({ action, onClose, onSaved }) {
               min={0}
               step={1}
               required
-              defaultValue={row.nivel_acesso}
+              defaultValue={row.nivelAcesso}
             />
           </div>
         )}

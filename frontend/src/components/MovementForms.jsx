@@ -486,7 +486,7 @@ export function AdjustmentForm({ stock, onSaved }) {
           unidades. O valor não é o saldo final.
         </p>
         <Field label="Motivo" className="full">
-          <textarea name="motivo" required maxLength={500} />
+          <textarea name="motivo" required maxLength={255} />
         </Field>
       </div>
     </ActionForm>

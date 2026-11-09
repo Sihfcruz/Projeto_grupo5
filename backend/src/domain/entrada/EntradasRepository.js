@@ -1,3 +1,4 @@
+const AppError = require('../../shared/errors/AppError');
 const db = require('../../config/database'); // Instância da pool (ex: mysql2/promise)
 
 class EntradasRepository {
@@ -58,6 +59,11 @@ class EntradasRepository {
 
         try {
             await connection.beginTransaction();
+
+            const [skus] = await connection.query(
+                'SELECT id_sku FROM sku WHERE id_sku = ? AND ativo = TRUE AND deleted_at IS NULL FOR UPDATE', [idSku]
+            );
+            if (!skus.length) throw new AppError('SKU não encontrado ou inativo.', 404);
 
             const [result] = await connection.query(
                 `INSERT INTO entrada

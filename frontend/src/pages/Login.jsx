@@ -23,11 +23,11 @@ export default function Login() {
         anonymous: true,
         body: { email: values.email.trim().toLowerCase(), senha: values.senha },
       });
-      if (!data?.acessToken || !data?.funcionario?.id)
+      if (!data?.accessToken || !data?.funcionario?.id)
         throw new Error("A API retornou uma sessão incompleta.");
       saveSession({
         mode: "api",
-        acessToken: data.acessToken,
+        accessToken: data.accessToken,
         refreshToken: data.refreshToken,
         funcionario: data.funcionario,
       });

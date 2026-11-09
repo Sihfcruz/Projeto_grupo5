@@ -17,7 +17,7 @@ module.exports = {
         tamanho: {
             obrigatorio: true,
             valida: (valor) => {
-                if (typeof valor !== 'number' || valor < 15 || valor > 50 || Math.abs(valor * 2 - Math.round(valor * 2)) > 1e-9) {
+                if (typeof valor !== 'number' || !Number.isFinite(valor) || valor < 15 || valor > 50 || Math.abs(valor * 2 - Math.round(valor * 2)) > 1e-9) {
                     throw new (require('../../shared/errors/AppError'))("O campo 'tamanho' deve estar entre 15 e 50 (múltiplos de 0,5).")
                 }
                 return valor

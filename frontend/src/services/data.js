@@ -54,7 +54,7 @@ export async function detail(path, id) {
               row.idEntrada ??
               row.idDevolucao ??
               row.id_funcionario ??
-              row.id_cargo,
+              row.idCargo,
           ) === Number(id),
       ),
     );
@@ -83,7 +83,9 @@ export function exportCSV(filename, headers, rows) {
 }
 
 export const enabled = (feature) =>
-  !isDemo() && config.features[feature] === true;
+  !isDemo() && config.features[feature] === true &&
+  (!["createEmployee", "deactivateEmployee", "editEmployee", "createRole", "editRole", "deleteRole", "adjustStock"].includes(feature) ||
+    getSession()?.funcionario?.papel === "admin");
 export function employeeId() {
   if (isDemo()) return 1;
   const id = Number(getSession()?.funcionario?.id);

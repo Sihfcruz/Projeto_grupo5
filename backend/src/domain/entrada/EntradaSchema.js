@@ -1,6 +1,6 @@
 const AppError = require('../../shared/errors/AppError');
 
-const REGEX_DATA_ISO = /^\d{4}-\d{2}-\d{2}$/;
+const { dataISO, decimalPositivo } = require('../../shared/lib/validators');
 
 class EntradaValidator {
     static validarCriacao(dados) {
@@ -33,12 +33,11 @@ class EntradaValidator {
         if (typeof lote !== 'string' || !lote.trim() || lote.trim().length > 20) {
             throw new AppError("O campo 'lote' é obrigatório e deve ter até 20 caracteres.");
         }
-        if (notaFiscal && (typeof notaFiscal !== 'string' || notaFiscal.length > 44)) {
+        if (notaFiscal !== undefined && notaFiscal !== null && (typeof notaFiscal !== 'string' || notaFiscal.length > 44)) {
             throw new AppError("O campo 'notaFiscal' deve ter até 44 caracteres.");
         }
-        if (typeof dataEntrada !== 'string' || !REGEX_DATA_ISO.test(dataEntrada) || Number.isNaN(Date.parse(dataEntrada))) {
-            throw new AppError("A 'dataEntrada' deve estar no formato AAAA-MM-DD válido.");
-        }
+        dataISO('dataEntrada')(dataEntrada);
+        decimalPositivo('valorTotal')(valorTotal);
     }
 }
 

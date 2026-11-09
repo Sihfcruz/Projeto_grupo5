@@ -29,7 +29,7 @@ const dadosValidos = () => ({
   nome: 'Maria Silva',
   dataNascimento: new Date(
     new Date().setFullYear(new Date().getFullYear() - 25),
-  ).toISOString(),
+  ).toISOString().slice(0, 10),
   senha: 'senha123',
   email: 'Maria@Email.com',
   idCargo: 1,
@@ -146,7 +146,7 @@ describe('FuncionarioService', () => {
     it('deve lançar erro quando o funcionário tem menos de 14 anos', async () => {
       const dataNascimento = new Date(
         new Date().setFullYear(new Date().getFullYear() - 10),
-      ).toISOString();
+      ).toISOString().slice(0, 10);
       const dados = { ...dadosValidos(), dataNascimento };
 
       await expect(FuncionarioService.cadastrarFuncionario(dados)).rejects.toMatchObject({

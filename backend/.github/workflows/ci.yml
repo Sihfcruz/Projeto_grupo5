@@ -29,17 +29,25 @@ jobs:
       - name: Configurar Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: 'npm'
+          cache-dependency-path: |
+            backend/package-lock.json
+            frontend/package-lock.json
 
       - name: Instalar dependências
-        run: npm ci
+        run: npm ci --prefix backend
 
-      - name: Checar tipos do TypeScript
-        run: npx tsc --noEmit
+      - name: Instalar frontend
+        run: npm ci --prefix frontend
+
+      - name: Validar frontend
+        run: |
+          npm test --prefix frontend
+          npm run build --prefix frontend
 
       - name: Criar tabelas no banco de dados
-        run: mysql -h 127.0.0.1 -u root -proot < src/config/schema.sql
+        run: mysql -h 127.0.0.1 -u root -proot < backend/src/config/schema.sql
 
       - name: Executar testes unitários e de integração
         env:
@@ -49,4 +57,4 @@ jobs:
           DB_NAME: nomade
           DB_PORT: 3306
           JWT_SECRET: "chave_secreta_de_teste"
-        run: npm run test
+        run: npm test --prefix backend

@@ -73,7 +73,7 @@ export default function Shell({ page, children }) {
           </a>
           <p className="nav-label">ESPAÇO DE TRABALHO</p>
           <nav aria-label="Navegação principal">
-            {navigation.map(([id, label, icon]) => (
+            {navigation.filter(([id]) => id !== "users" || isDemo() || session?.funcionario?.papel === "admin").map(([id, label, icon]) => (
               <a
                 href={`${id}.html`}
                 aria-current={id === page ? "page" : undefined}

@@ -2,7 +2,7 @@ const DevolucaoRepository = require('./DevolucaoRepository');
 const AppError = require('../../shared/errors/AppError');
 
 const ehInteiroPositivo = (valor) => Number.isInteger(valor) && valor > 0;
-const REGEX_DATA_ISO = /^\d{4}-\d{2}-\d{2}$/;
+const { dataISO } = require('../../shared/lib/validators');
 
 class DevolucaoService {
   async listarDevolucoes() {
@@ -91,8 +91,9 @@ class DevolucaoService {
     }
 
     // 7. Validação da Data (Formato AAAA-MM-DD)
-    if (typeof dataDevolucao !== 'string' || !REGEX_DATA_ISO.test(dataDevolucao) || Number.isNaN(Date.parse(dataDevolucao))) {
-      throw new AppError("A 'dataDevolucao' é obrigatória e deve estar no formato AAAA-MM-DD.");
+    dataISO('dataDevolucao')(dataDevolucao);
+    if (Math.abs(valorReembolso * 100 - Math.round(valorReembolso * 100)) > 1e-6) {
+      throw new AppError('O reembolso aceita no máximo 2 casas decimais.');
     }
 
     // 8. Persistência e captura de validações registradas no SGBD (Triggers e FKs)

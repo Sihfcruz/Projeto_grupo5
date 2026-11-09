@@ -11,7 +11,7 @@ const decodificarCursor = (cursorStr) => {
     const jsonStr = Buffer.from(cursorStr, 'base64url').toString('utf8')
     const parsed = JSON.parse(jsonStr)
 
-    if (!parsed.dataVenda || !parsed.idVenda || isNaN(Date.parse(parsed.dataVenda))) {
+    if (!parsed || typeof parsed.dataVenda !== 'string' || !Number.isInteger(parsed.idVenda) || parsed.idVenda <= 0 || isNaN(Date.parse(parsed.dataVenda))) {
       throw new Error()
     }
     return parsed
@@ -49,6 +49,7 @@ const paraCentavos = (valor, campo) => {
 class VendaService {
 
   async listarVendasPaginadas({ limite = 20, cursor = null }) {
+    if (!Number.isInteger(limite) || limite < 1 || limite > 100) throw new AppError('O limite deve ser um inteiro entre 1 e 100.', 400)
     let cursorDecodificado = null
 
     if (cursor) {
@@ -212,6 +213,7 @@ class VendaService {
           itensValidados.map((i) => i.idSku)
         )
         const precoPorSku = new Map(skus.map((s) => [s.id_sku, Math.round(Number(s.preco_venda) * 100)]))
+        const estoquePorSku = new Map(skus.map((s) => [s.id_sku, Number(s.quantidade_estoque)]))
 
         let subtotalCent = 0
 
@@ -220,6 +222,10 @@ class VendaService {
 
           if (precoCent === undefined) {
             throw new AppError(`SKU ${item.idSku} não foi encontrado ou está inativo.`, 404)
+          }
+
+          if (item.quantidade > estoquePorSku.get(item.idSku)) {
+            throw new AppError(`Estoque insuficiente para o SKU ${item.idSku}.`, 409)
           }
 
           const brutoCent = precoCent * item.quantidade
@@ -242,6 +248,9 @@ class VendaService {
         }
 
         const totalCent = subtotalCent - descontoVendaCent
+        if (!Number.isSafeInteger(totalCent) || totalCent > 9999999999) {
+          throw new AppError('O total da venda excede o limite de 99.999.999,99.', 400)
+        }
 
         // Se houver pagamentos, precisam fechar exatamente o total
         const somaPagamentosCent = pagamentosValidados.reduce((acc, p) => acc + p.valorCent, 0)

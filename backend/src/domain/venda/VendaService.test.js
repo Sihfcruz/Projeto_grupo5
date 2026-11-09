@@ -17,6 +17,12 @@ const venda = (extra = {}) => ({
 })
 
 describe('VendaService.criarVenda', () => {
+  it('recusa falta de estoque antes de inserir valores que podem exceder o limite SQL', async () => {
+    Repo.bloquearSkus.mockResolvedValue([{ id_sku: 10, preco_venda: 200, quantidade_estoque: 5 }])
+    await expect(Service.criarVenda(venda({ itens: [{ idSku: 10, quantidade: 999999 }] })))
+      .rejects.toMatchObject({ statusCode: 409 })
+    expect(Repo.inserirVenda).not.toHaveBeenCalled()
+  })
   it.each([
     [{ idFuncionario: 0 }], [{ canal: 'LOJA2' }], [{ itens: [] }], [{ desconto: -1 }],
     [{ itens: [{ idSku: 1, quantidade: 0 }] }],

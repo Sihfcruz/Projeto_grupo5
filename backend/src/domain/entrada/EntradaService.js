@@ -61,7 +61,7 @@ class EntradaService {
 
         // 2. Validação de Regra de Negócio (Existência de Entidades Relacionadas)
         const skuExiste = await this.skuRepo.findById(idSku);
-        if (!skuExiste) {
+        if (!skuExiste || Number(skuExiste.ativo) === 0) {
             throw new AppError(`SKU ${idSku} não foi encontrado.`, 404);
         }
 
