@@ -1,25 +1,25 @@
 require('dotenv').config()
 const app = require('./app')
 const pool = require('./config/database')
+const AuthRepository = require('./domain/auth/AuthFuncionarioRepository')
 
 const PORT = process.env.PORT || 3000
 
 console.log('Inicializando servidor!')
 
-function verifyToken() {
-    const primaryKey = process.env.JWT_SECRET
-    const secondKey = process.env.JWT_SECRET_SECUNDARY
+function validateEnv() {
+    const secret = process.env.JWT_SECRET || process.env.JWT_SECRET_SECUNDARY
+    if (!secret || secret.length < 32)
+        throw new Error('JWT_SECRET ausente ou muito curto (mínimo 32 caracteres)')
 
-    if (primaryKey && primaryKey.length >= 32) return primaryKey
-    if (secondKey && secondKey.length >= 32) return secondKey
-
-    throw new Error("Falha crítica: Nenhuma chave JWT válida (com +32 caractéres), foi encontrada no env")
+    const refreshSecret = process.env.JWT_REFRESH_SECRET
+    if (!refreshSecret || refreshSecret.length < 32)
+        throw new Error('JWT_REFRESH_SECRET ausente ou muito curto (mínimo 32 caracteres)')
 }
 
 async function startServer() {
     try {
-        const secretKey = verifyToken()
-        app.set('secretKey', secretKey)
+        validateEnv()
 
         const connection = await pool.getConnection()
         console.log('Conexão estabelecida')
@@ -28,6 +28,11 @@ async function startServer() {
         app.listen(PORT, () => {
             console.log('Servidor rodando na porta', { PORT })
         })
+
+        // Limpa refresh tokens expirados uma vez por hora
+        setInterval(() => {
+            AuthRepository.removerExpirados().catch(() => {})
+        }, 60 * 60 * 1000)
     } catch (error) {
         console.error('Erro ao realizar a conexão com o banco de dados', error)
         process.exit(1)

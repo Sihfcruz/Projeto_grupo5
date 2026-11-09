@@ -17,7 +17,7 @@ export function isDemo() {
 }
 export function requireSession() {
   const session = getSession();
-  if (!session || (session.mode !== "demo" && !session.acessToken)) {
+  if (!session || (session.mode !== "demo" && !session.accessToken)) {
     location.replace("login.html");
     return false;
   }

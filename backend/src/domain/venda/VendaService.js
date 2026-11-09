@@ -342,6 +342,50 @@ class VendaService {
       dados: await VendaRepository.buscarVendaPorId(idNumerico)
     }
   }
+
+  async registrarPagamento(idVenda, pagamento) {
+    const idNum = Number(idVenda)
+    if (!ehInteiroPositivo(idNum)) throw new AppError('Id inválido', 400)
+
+    const { forma, parcelas = 1, valor, status = 'PENDENTE' } = pagamento || {}
+
+    if (!FORMAS_PAGAMENTO.includes(forma))
+      throw new AppError(`'forma' deve ser um de: ${FORMAS_PAGAMENTO.join(', ')}.`)
+    if (!STATUS_PAGAMENTO.includes(status))
+      throw new AppError(`'status' deve ser um de: ${STATUS_PAGAMENTO.join(', ')}.`)
+    if (!Number.isInteger(parcelas) || parcelas < 1 || parcelas > 24)
+      throw new AppError("'parcelas' deve ser um inteiro entre 1 e 24.")
+    if (parcelas > 1 && forma !== 'CARTAO_CREDITO')
+      throw new AppError('Parcelamento só é permitido no cartão de crédito.')
+
+    const valorCent = paraCentavos(valor, 'valor')
+    if (valorCent <= 0) throw new AppError("'valor' deve ser maior que zero.")
+
+    await VendaRepository.executarEmTransacao(async (connection) => {
+      const venda = await VendaRepository.buscarStatusParaAtualizar(connection, idNum)
+      if (!venda) throw new AppError('Venda não encontrada', 404)
+      if (venda.status === 'CANCELADA')
+        throw new AppError('Não é possível adicionar pagamento a uma venda cancelada.', 409)
+
+      await VendaRepository.inserirPagamentos(connection, idNum, [{
+        forma, parcelas, status, valor: valorCent / 100
+      }])
+
+      if (status === 'APROVADO') {
+        const [pagamentos] = await connection.query(
+          "SELECT SUM(valor) AS soma FROM pagamento WHERE id_venda = ? AND status = 'APROVADO'",
+          [idNum]
+        )
+        const totalPago = Number(pagamentos[0].soma || 0)
+        const [vendaRow] = await connection.query('SELECT valor_total FROM venda WHERE id_venda = ?', [idNum])
+        if (totalPago >= vendaRow[0].valor_total) {
+          await VendaRepository.atualizarStatus(connection, idNum, 'PAGA')
+        }
+      }
+    })
+
+    return { sucesso: true, mensagem: 'Pagamento registrado com sucesso!', dados: await VendaRepository.buscarVendaPorId(idNum) }
+  }
 }
 
 module.exports = new VendaService()

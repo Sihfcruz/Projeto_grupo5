@@ -43,6 +43,11 @@ class AuthRepository {
     async removerRefreshToken(token) {
         await pool.query('DELETE FROM refresh_tokens WHERE token = ?', [token])
     }
+
+    async removerExpirados() {
+        const [result] = await pool.query('DELETE FROM refresh_tokens WHERE expira_em <= NOW()')
+        return result.affectedRows
+    }
 }
 
 module.exports = new AuthRepository()

@@ -1,133 +1,160 @@
-# 📋 Documentação de Rotas - Projeto Grupo 5
+# Documentação de Rotas - Nomade API
 
-## 🔐 Auth
-**Base URL:** `/auth`
-
-| Método | Rota | Descrição |
-|--------|------|-----------|
-| POST | `/login` | Autenticar usuário |
-| POST | `/refresh-token` | Renovar token JWT |
-| POST | `/logout` | Fazer logout |
+Todas as rotas (exceto `/auth`) exigem `Authorization: Bearer <accessToken>`.  
+Rotas marcadas com **(admin)** exigem `nivel_acesso >= 100`.
 
 ---
 
-## 📦 Cargo
-**Base URL:** `/cargo`
+## /auth
 
 | Método | Rota | Descrição |
 |--------|------|-----------|
-| GET | `/` | Listar todos os cargos |
+| POST | `/login` | Autenticar (retorna `accessToken` + `refreshToken`) |
+| POST | `/refresh-token` | Renovar tokens (rotação) |
+| POST | `/logout` | Invalidar refresh token |
+
+---
+
+## /cargo (admin escrita)
+
+| Método | Rota | Descrição |
+|--------|------|-----------|
+| GET | `/` | Listar cargos |
 | GET | `/:id` | Buscar cargo por ID |
-| POST | `/` | Cadastrar novo cargo |
-| PUT | `/:id` | Atualizar cargo |
-| DELETE | `/:id` | Excluir cargo |
+| POST | `/` **(admin)** | Cadastrar cargo |
+| PUT | `/:id` **(admin)** | Atualizar cargo |
+| DELETE | `/:id` **(admin)** | Excluir cargo |
 
 ---
 
-## 🏭 Produto
-**Base URL:** `/produto`
+## /funcionario (admin)
 
 | Método | Rota | Descrição |
 |--------|------|-----------|
-| GET | `/ativos` | Listar produtos ativos |
-| GET | `/desativados` | Listar produtos desativados |
-| GET | `/:id` | Buscar produto por ID |
-| POST | `/` | Cadastrar novo produto |
-| PUT | `/:id` | Atualizar produto |
+| GET | `/` | Listar funcionários ativos |
+| GET | `/:id` | Buscar funcionário |
+| POST | `/` | Cadastrar funcionário |
+| PUT / PATCH | `/:id` | Atualizar funcionário |
+| DELETE | `/:id` | Desativar funcionário (soft delete) |
+| DELETE | `/:id/permanente` | Excluir permanentemente |
 
 ---
 
-## 👥 Funcionário
-**Base URL:** `/funcionario`
+## /marca
 
 | Método | Rota | Descrição |
 |--------|------|-----------|
-| GET | `/` | Listar todos os funcionários |
-| GET | `/:id` | Buscar funcionário por ID |
-| POST | `/` | Cadastrar novo funcionário |
-| PUT | `/:id` | Atualizar funcionário |
-| DELETE | `/:id` | Excluir funcionário |
+| GET | `/` | Listar marcas |
+| GET | `/:id` | Buscar marca |
+| POST | `/` | Cadastrar marca |
+| PUT / PATCH | `/:id` | Atualizar marca |
+| DELETE | `/:id` **(admin)** | Excluir marca |
 
 ---
 
-## 🔄 Devolução
-**Base URL:** `/devolucao`
+## /categoria
 
 | Método | Rota | Descrição |
 |--------|------|-----------|
-| GET | `/` | Listar todas as devoluções |
-| GET | `/:id` | Buscar devolução por ID |
-| POST | `/` | Cadastrar nova devolução |
+| GET | `/` | Listar categorias |
+| GET | `/:id` | Buscar categoria |
+| POST | `/` | Cadastrar categoria |
+| PUT / PATCH | `/:id` | Atualizar categoria |
+| DELETE | `/:id` **(admin)** | Excluir categoria |
 
 ---
 
-## 📥 Entrada
-**Base URL:** `/entrada`
+## /modelo
 
 | Método | Rota | Descrição |
 |--------|------|-----------|
-| GET | `/` | Listar todas as entradas |
-| GET | `/:id` | Buscar entrada por ID |
-| POST | `/` | Cadastrar nova entrada |
+| GET | `/` | Listar modelos |
+| GET | `/:id` | Buscar modelo |
+| POST | `/` | Cadastrar modelo (`idMarca`, `idCategoria` obrigatórios) |
+| PUT / PATCH | `/:id` | Atualizar modelo |
+| DELETE | `/:id` **(admin)** | Soft delete |
 
 ---
 
-## 📤 Saída
-**Base URL:** `/saida`
+## /fornecedor
 
 | Método | Rota | Descrição |
 |--------|------|-----------|
-| GET | `/` | Listar todas as saídas |
-| GET | `/:id` | Buscar saída por ID |
-| POST | `/` | Cadastrar nova saída |
+| GET | `/` | Listar fornecedores |
+| GET | `/:id` | Buscar fornecedor |
+| POST | `/` | Cadastrar fornecedor |
+| PUT / PATCH | `/:id` | Atualizar fornecedor |
+| DELETE | `/:id` **(admin)** | Soft delete |
 
 ---
 
-## 📌 Resumo Estatístico
+## /cliente
 
-| Domínio | GET | POST | PUT | DELETE | Total |
-|---------|-----|------|-----|--------|-------|
-| Auth | 0 | 3 | 0 | 0 | 3 |
-| Cargo | 2 | 1 | 1 | 1 | 5 |
-| Produto | 3 | 1 | 1 | 0 | 5 |
-| Funcionário | 2 | 1 | 1 | 1 | 5 |
-| Devolução | 2 | 1 | 0 | 0 | 3 |
-| Entrada | 2 | 1 | 0 | 0 | 3 |
-| Saída | 2 | 1 | 0 | 0 | 3 |
-| **TOTAL** | **13** | **9** | **3** | **2** | **27** |
+| Método | Rota | Descrição |
+|--------|------|-----------|
+| GET | `/` | Listar clientes |
+| GET | `/:id` | Buscar cliente |
+| POST | `/` | Cadastrar cliente |
+| PUT / PATCH | `/:id` | Atualizar cliente |
+| DELETE | `/:id` **(admin)** | Soft delete |
 
 ---
 
-## ⚙️ Configuração no app.js
+## /sku
 
-As rotas são registradas no `app.js` com os seguintes prefixos:
-
-```javascript
-app.use('/auth', AuthRoutes);
-app.use('/cargo', CargoRoutes);
-app.use('/produto', ProdutoRoutes);
-app.use('/funcionario', FuncionarioRoutes);
-app.use('/devolucao', DevolucaoRoutes);
-app.use('/entrada', EntradaRoutes);
-app.use('/saida', SaidaRoutes);
-```
+| Método | Rota | Descrição |
+|--------|------|-----------|
+| GET | `/` | Listar SKUs |
+| GET | `/:id` | Buscar SKU |
+| POST | `/` | Cadastrar SKU |
+| PUT / PATCH | `/:id` | Atualizar SKU |
+| DELETE | `/:id` **(admin)** | Soft delete |
 
 ---
 
-## 📝 Padrões Implementados
+## /entrada
 
-✅ **Estrutura CRUD Consistente:**
-- GET (listar)
-- GET /:id (buscar por ID)
-- POST (criar)
-- PUT /:id (atualizar)
-- DELETE /:id (excluir - quando aplicável)
+| Método | Rota | Descrição |
+|--------|------|-----------|
+| GET | `/` | Listar entradas |
+| GET | `/:id` | Buscar entrada |
+| POST | `/` | Registrar entrada (incrementa estoque) |
 
-✅ **Validação:**
-- Produto: Validação de ID numérico na rota
+---
 
-✅ **Comentários Descritivos:**
-- Todas as rotas possuem comentários explicativos
+## /venda
 
-✅ **Pontuação Consistente:**
-- Todos os statements terminam com `;`
+| Método | Rota | Descrição |
+|--------|------|-----------|
+| GET | `/` | Listar vendas (paginado) |
+| GET | `/:id` | Buscar venda com itens e pagamentos |
+| POST | `/` | Criar venda |
+| PATCH | `/:id/status` | Atualizar status (ABERTA → PAGA/CANCELADA/…) |
+| PATCH | `/:id/pagamento` | Adicionar pagamento a uma venda |
+
+---
+
+## /devolucao
+
+| Método | Rota | Descrição |
+|--------|------|-----------|
+| GET | `/` | Listar devoluções |
+| GET | `/:id` | Buscar devolução |
+| POST | `/` | Registrar devolução (valida contra item vendido) |
+
+---
+
+## /ajuste (admin)
+
+| Método | Rota | Descrição |
+|--------|------|-----------|
+| GET | `/` **(admin)** | Listar ajustes de estoque |
+| POST | `/` **(admin)** | Registrar ajuste manual (`idSku`, `quantidade`, `motivo`) |
+
+---
+
+## /estoque
+
+| Método | Rota | Descrição |
+|--------|------|-----------|
+| GET | `/` | Consultar estoque atual (`vw_estoque_atual`) |

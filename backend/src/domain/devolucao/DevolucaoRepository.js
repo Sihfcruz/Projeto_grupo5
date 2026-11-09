@@ -52,7 +52,8 @@ class DevolucaoRepository {
             await connection.beginTransaction();
 
             const [itens] = await connection.query(
-                `SELECT iv.id_item_venda, iv.id_sku, iv.quantidade, iv.preco_unitario, v.status
+                `SELECT iv.id_item_venda, iv.id_sku, iv.quantidade, iv.preco_unitario,
+                        COALESCE(iv.desconto_item, 0) AS desconto_item, v.status
                    FROM item_venda iv
                    JOIN venda v ON v.id_venda = iv.id_venda
                   WHERE iv.id_item_venda = ?
@@ -77,7 +78,7 @@ class DevolucaoRepository {
                 );
             }
 
-            const maxReembolso = Math.round(item.preco_unitario * devolucaoData.quantidade * 100) / 100;
+            const maxReembolso = Math.round((item.preco_unitario - item.desconto_item) * devolucaoData.quantidade * 100) / 100;
             if (devolucaoData.valor_reembolso > maxReembolso) {
                 throw new AppError(`O reembolso não pode passar de ${maxReembolso.toFixed(2)}.`, 400);
             }

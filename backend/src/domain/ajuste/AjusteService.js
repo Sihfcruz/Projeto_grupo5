@@ -2,6 +2,11 @@ const AjusteRepository = require('./AjusteRepository');
 const AppError = require('../../shared/errors/AppError');
 
 class AjusteService {
+    async listar() {
+        const dados = await AjusteRepository.listar()
+        return { sucesso: true, dados, total: dados.length }
+    }
+
     // quantidade: positiva (acrescenta) ou negativa (retira). Nunca zero.
     async ajustar(idSku, quantidade, motivo, idFuncionario = null) {
         if (!Number.isInteger(idSku) || idSku <= 0) throw new AppError("O campo 'idSku' deve ser um inteiro positivo.");

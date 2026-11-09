@@ -19,9 +19,9 @@ async function renewSession() {
         body: { refreshToken: session.refreshToken },
         anonymous: true,
       });
-      if (typeof result?.acessToken !== "string")
+      if (typeof result?.accessToken !== "string")
         throw new ApiError("Resposta de autenticação inválida.", 401);
-      saveSession({ ...session, acessToken: result.acessToken });
+      saveSession({ ...session, accessToken: result.accessToken, refreshToken: result.refreshToken ?? session.refreshToken });
     })().finally(() => {
       refreshing = undefined;
     });
@@ -39,8 +39,8 @@ export async function request(
   const headers = { Accept: "application/json" };
   if (body !== undefined) headers["Content-Type"] = "application/json";
   const session = getSession();
-  if (!anonymous && session?.acessToken)
-    headers.Authorization = `Bearer ${session.acessToken}`;
+  if (!anonymous && session?.accessToken)
+    headers.Authorization = `Bearer ${session.accessToken}`;
   try {
     const response = await fetch(`${config.apiUrl.replace(/\/$/, "")}${path}`, {
       method,

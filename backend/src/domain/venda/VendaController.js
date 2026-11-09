@@ -36,6 +36,14 @@ class VendaController {
             next(error);
         }
     }
+
+    async registrarPagamento(req, res, next) {
+        try {
+            return res.status(201).json(await VendaService.registrarPagamento(req.params.id, req.body || {}));
+        } catch (error) {
+            next(error);
+        }
+    }
 }
 
 module.exports = new VendaController();

@@ -17,13 +17,18 @@ const config = {
 
     //CORS
     cors: {
-        allowedOrigins: (process.env.ALLOWED_ORIGINS || 'http://localhost:3000,http://localhost:5173').split(',')
+        allowedOrigins: (process.env.ALLOWED_ORIGINS || 'http://localhost:3000,http://localhost:5173,http://localhost:5500').split(',')
     },
 
     jwt: {
         secret: process.env.JWT_SECRET || process.env.JWT_SECRET_SECUNDARY,
-        expiry: process.env.JWT_EXPIRY || '7d'
+        expiry: process.env.JWT_EXPIRY || '15m',
+        refreshSecret: process.env.JWT_REFRESH_SECRET,
+        refreshExpiry: process.env.JWT_REFRESH_EXPIRY || '7d',
+        refreshExpiryDays: parseInt(process.env.JWT_REFRESH_EXPIRY_DAYS || '7', 10)
     },
+
+    nivelAdmin: parseInt(process.env.NIVEL_ADMIN || '100', 10),
 
     //API
     isDevelopment: process.env.NODE_ENV !== 'production',

@@ -72,8 +72,8 @@ export async function init() {
       await request("/cargo", {
         method: "POST",
         body: {
-          nome_cargo: form.nome_cargo.value.trim(),
-          nivel_acesso: Number(form.nivel_acesso.value),
+          nome: form.nome_cargo.value.trim(),
+          nivelAcesso: Number(form.nivel_acesso.value),
         },
       });
       form.reset();
@@ -113,7 +113,7 @@ async function load() {
       roles
         .map(
           (r) =>
-            `<tr><td>#${e(r.id_cargo)}</td><td>${e(r.nome_cargo)}</td><td>${e(r.nivel_acesso)}</td><td><div class="row-actions"><button class="text-button" data-role-edit="${e(r.id_cargo)}" ${enabled("editRole") ? "" : "disabled"}>Editar</button><button class="text-button" data-role-remove="${e(r.id_cargo)}" ${enabled("deleteRole") ? "" : "disabled"}>Excluir</button></div></td></tr>`,
+            `<tr><td>#${e(r.idCargo)}</td><td>${e(r.nome)}</td><td>${e(r.nivelAcesso)}</td><td><div class="row-actions"><button class="text-button" data-role-edit="${e(r.idCargo)}" ${enabled("editRole") ? "" : "disabled"}>Editar</button><button class="text-button" data-role-remove="${e(r.idCargo)}" ${enabled("deleteRole") ? "" : "disabled"}>Excluir</button></div></td></tr>`,
         )
         .join("") || emptyRow(4);
   } else {
@@ -122,8 +122,8 @@ async function load() {
   }
   $("[name=idCargo]", $("#employee-form")).innerHTML = options(
     roles,
-    "id_cargo",
-    "nome_cargo",
+    "idCargo",
+    "nome",
   );
   if (results[0].status === "fulfilled") {
     employees = results[0].value;
@@ -145,16 +145,16 @@ function renderEmployees() {
     filtered
       .map(
         (r) =>
-          `<tr><td><strong>${e(r.nome_completo)}</strong><small>#${e(r.id_funcionario)}</small></td><td>${e(r.email)}</td><td>${e(roles.find((c) => Number(c.id_cargo) === Number(r.id_cargo))?.nome_cargo || `Cargo #${r.id_cargo}`)}</td><td><div class="row-actions"><button class="text-button" data-edit="${e(r.id_funcionario)}" ${enabled("editEmployee") ? "" : "disabled"}>Editar</button><button class="text-button" data-remove="${e(r.id_funcionario)}" ${enabled("deactivateEmployee") && Number(getSession()?.funcionario?.id) !== Number(r.id_funcionario) ? "" : "disabled"}>Desativar</button></div></td></tr>`,
+          `<tr><td><strong>${e(r.nome_completo)}</strong><small>#${e(r.id_funcionario)}</small></td><td>${e(r.email)}</td><td>${e(roles.find((c) => Number(c.idCargo) === Number(r.id_cargo))?.nome || `Cargo #${r.id_cargo}`)}</td><td><div class="row-actions"><button class="text-button" data-edit="${e(r.id_funcionario)}" ${enabled("editEmployee") ? "" : "disabled"}>Editar</button><button class="text-button" data-remove="${e(r.id_funcionario)}" ${enabled("deactivateEmployee") && Number(getSession()?.funcionario?.id) !== Number(r.id_funcionario) ? "" : "disabled"}>Desativar</button></div></td></tr>`,
       )
       .join("") || emptyRow(4);
 }
 function confirmRemove(type, id) {
   const employee = type === "employee";
   const row = (employee ? employees : roles).find(
-    (r) => Number(employee ? r.id_funcionario : r.id_cargo) === id,
+    (r) => Number(employee ? r.id_funcionario : r.idCargo) === id,
   );
-  const name = employee ? row.nome_completo : row.nome_cargo;
+  const name = employee ? row.nome_completo : row.nome;
   const feature = employee ? "deactivateEmployee" : "deleteRole";
   if (!enabled(feature)) return;
   $("#dialog-title").textContent = employee
@@ -205,11 +205,11 @@ function editEmployee(id) {
   });
 }
 function editRole(id) {
-  const row = roles.find((r) => Number(r.id_cargo) === id);
+  const row = roles.find((r) => Number(r.idCargo) === id);
   if (!enabled("editRole")) return;
   $("#dialog-title").textContent = "Editar cargo";
   $("#dialog-content").innerHTML =
-    `<form id="edit-form">${formMessages}<div class="form-grid">${field("Nome", "nome_cargo", `required maxlength="100" value="${e(row.nome_cargo)}"`)}${field("Nível de acesso", "nivel_acesso", `type="number" min="0" step="1" required value="${e(row.nivel_acesso)}"`)}</div><div class="form-actions"><button class="button" type="submit">Salvar cargo</button></div></form>`;
+    `<form id="edit-form">${formMessages}<div class="form-grid">${field("Nome", "nome_cargo", `required maxlength="100" value="${e(row.nome)}"`)}${field("Nível de acesso", "nivel_acesso", `type="number" min="0" step="1" required value="${e(row.nivelAcesso)}"`)}</div><div class="form-actions"><button class="button" type="submit">Salvar cargo</button></div></form>`;
   $("#detail-dialog").showModal();
   const form = $("#edit-form");
   guardForm(form, "editRole");
@@ -219,8 +219,8 @@ function editRole(id) {
       await request(`/cargo/${id}`, {
         method: "PUT",
         body: {
-          nome_cargo: form.nome_cargo.value.trim(),
-          nivel_acesso: Number(form.nivel_acesso.value),
+          nome: form.nome_cargo.value.trim(),
+          nivelAcesso: Number(form.nivel_acesso.value),
         },
       });
       $("#detail-dialog").close();

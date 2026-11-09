@@ -6,15 +6,14 @@ API de gestão de estoque, vendas e trocas de uma loja de tênis (Node.js + Expr
 
 ```bash
 npm install
-cp .env.example .env          # preencha DB_* e as duas chaves JWT (mín. 32 caracteres)
-mysql -u root -p < src/config/schema.sql
+cp .env.example .env          # preencha DB_*, JWT_SECRET e JWT_REFRESH_SECRET (mín. 32 chars cada)
+mysql -u root -p nomade < src/config/schema.sql
 ADMIN_EMAIL=admin@nomade.com ADMIN_SENHA='SenhaForte123' npm run seed:admin
-npm start                     # ou: npm run dev
+npm start
 ```
 
-- Documentação interativa: `http://localhost:3000/api-docs` (regenerar com `npm run swagger`)
-- Testes unitários: `npm test`
-- Teste ponta a ponta (precisa de MySQL com o schema carregado): `npm run test:e2e`
+- Documentação interativa: `http://localhost:3000/api-docs`
+- Testes: `npm test`
 
 ## Autenticação
 
@@ -42,4 +41,5 @@ Tudo roda em transação com `SELECT ... FOR UPDATE`. O funcionário responsáve
 ## Rotas
 
 `/auth`, `/cargo`, `/funcionario`, `/marca`, `/categoria`, `/modelo`, `/fornecedor`, `/cliente`, `/sku`,
-`/entrada`, `/venda` (inclui `PATCH /:id/status`), `/devolucao`, `/ajuste`, `/estoque`.
+`/entrada`, `/venda` (inclui `PATCH /:id/status` e `PATCH /:id/pagamento`), `/devolucao`,
+`/ajuste` (inclui `GET /`), `/estoque`.

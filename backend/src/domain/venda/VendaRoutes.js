@@ -6,5 +6,6 @@ router.get('/', VendaController.listarVendasPaginadas);
 router.get('/:id', VendaController.buscarPorId);
 router.post('/', VendaController.cadastrar);
 router.patch('/:id/status', VendaController.atualizarStatus);
+router.patch('/:id/pagamento', VendaController.registrarPagamento);
 
 module.exports = router;
